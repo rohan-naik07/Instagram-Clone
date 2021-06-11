@@ -1,3 +1,4 @@
+import 'package:first_flutter_project/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -147,9 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             //padding: EdgeInsets.symmetric(horizontal: 15),
                             child: TextFormField(
                                 validator: validatePassword,
-                                onSaved: (value) {
-                                  _password = value;
-                                },
+                                onSaved: (value) => _password = value,
                                 controller: _passwordController,
                                 obscureText: true,
                                 style: TextStyle(color: Colors.white),
@@ -165,7 +164,6 @@ class _SignUpPageState extends State<SignUpPage> {
                           Padding(
                             padding: const EdgeInsets.only(
                                 left: 15.0, right: 15.0, top: 15, bottom: 0),
-                            //padding: EdgeInsets.symmetric(horizontal: 15),
                             child: TextFormField(
                                 validator: validateConfirmPassword,
                                 controller: _confirmPasswordController,
@@ -201,11 +199,17 @@ class _SignUpPageState extends State<SignUpPage> {
                             if (user != null) {
                               print('Registered Successfully.');
                               setState(() {
-                                successMessage =
-                                'Registered Successfully.\nYou can now navigate to Login Page.';
+                                successMessage = 'Registered Successfully';
                               });
-                            } else {
+                              Navigator.pushReplacement(context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginPage()
+                                ),
+                              );                            } else {
                               print('Error while Login.');
+                              setState(() {
+                                errorMessage = 'Error while Login.';
+                              });
                             }
                           });
                         }
@@ -220,11 +224,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 (successMessage != '' ? Text(
                   successMessage.toString(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24, color: Colors.green),
+                  style: TextStyle(fontSize: 15, color: Colors.green),
                 ) : errorMessage !='' ? Text(
                     successMessage.toString(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, color: Colors.red)
+                    style: TextStyle(fontSize: 15, color: Colors.red)
                 ) : Container()),
                 SizedBox(height: 130),
                 TextButton(

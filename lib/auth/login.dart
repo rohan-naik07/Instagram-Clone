@@ -1,7 +1,9 @@
+import 'package:first_flutter_project/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:first_flutter_project/auth/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,7 +13,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _emailIdController = TextEditingController(text: '');
-  final _userNameController = TextEditingController(text: '');
+  final _passwordController = TextEditingController(text: '');
   final FirebaseAuth auth = FirebaseAuth.instance;
   String? errorMessage = '';
   String? successMessage = '';
@@ -19,35 +21,43 @@ class _LoginPageState extends State<LoginPage> {
   String? _emailId;
   String? _password;
 
+  Future<void> setCredentials (token,id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('token', token);
+    prefs.setString('user-id', id);
+  }
+
   Future<User?> signIn (email, password) async {
     try {
       UserCredential user = await auth.signInWithEmailAndPassword(
           email: email.toString(),
           password: password.toString()
       );
+
       assert(user != null);
       assert(await user.user!.getIdToken() != null);
+      final User currentUser = await auth.currentUser!;
+      assert(user.user!.uid.toString() == currentUser.uid);
       return user.user;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
     } on PlatformException catch (e) {
       handleError(e);
+      return null;
     }
   }
 
   handleError(PlatformException error) {
     print(error);
     switch (error.code) {
-      case 'ERROR_EMAIL_ALREADY_IN_USE':
+      case 'ERROR_USER_NOT_FOUND':
         setState(() {
-          errorMessage = 'Email Id already Exist!!!';
+          errorMessage = 'User Not Found!!!';
         });
         break;
-      default:
+      case 'ERROR_WRONG_PASSWORD':
+        setState(() {
+          errorMessage = 'Wrong Password!!!';
+        });
+        break;
     }
   }
 
@@ -90,53 +100,95 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: TextField(
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    fillColor: Colors.white10,
-                    filled: true,
-                    hintText: 'Email',
-                    hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+            Form(
+              autovalidateMode: AutovalidateMode.always, key: _formStateKey,
+              child: Column(
+                children: <Widget> [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: TextFormField(
+                      validator: validateEmail,
+                      onSaved: (value) {
+                        _emailId = value;
+                      },
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailIdController,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        fillColor: Colors.white10,
+                        filled: true,
+                        hintText: 'Email',
+                        hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 15.0, right: 15.0, top: 15, bottom: 0),
+                    //padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: TextFormField(
+                        validator: validatePassword,
+                        onSaved: (value) {
+                          _password = value;
+                        },
+                        controller: _passwordController,
+                        obscureText: true,
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          fillColor: Colors.white10,
+                          filled: true,
+                          hintText: 'Password',
+                          hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+                        )
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: Container(
+                height: 50,
+                width: 300,
+                decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                child: TextButton(
+                  onPressed: () {
+                    if (_formStateKey.currentState!.validate()) {
+                      _formStateKey.currentState!.save();
+                      signIn(_emailId, _password).then((user) {
+                        if (user != null) {
+                          setState(() {
+                            successMessage = 'Logged In Successfully';
+                          });
+                          setCredentials(user.getIdToken().toString(), user.uid)
+                              .then((value) => {
+                                  Navigator.pushReplacement(context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyHomePage()
+                                    ),
+                                  )
+                              });
+                        } else {
+                          print('Error while Login.');
+                          setState(() {
+                            errorMessage = 'Error while Login.';
+                          });
+                        }
+                      });
+                    }
+                  },
+                  child: Text(
+                    'Log In',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  left: 15.0, right: 15.0, top: 15, bottom: 0),
-              //padding: EdgeInsets.symmetric(horizontal: 15),
-              child: TextField(
-                obscureText: true,
-                  style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    fillColor: Colors.white10,
-                    filled: true,
-                    hintText: 'Password',
-                    hintStyle: TextStyle(fontSize: 15, color: Colors.white),
-                )
-              ),
-            ),
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Container(
-              height: 50,
-              width: 300,
-              decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(10)
-                ),
-              child: TextButton(
-                onPressed: null,
-                child: Text(
-                  'Log In',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-              ),
-            ),
-          ),
             TextButton(
               onPressed:null,
               child: Text(
@@ -144,6 +196,15 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ),
+            (successMessage != '' ? Text(
+              successMessage.toString(),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15, color: Colors.green),
+            ) : errorMessage !='' ? Text(
+                successMessage.toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.red)
+            ) : Container()),
             SizedBox(height: 130),
             TextButton(
               onPressed:(){

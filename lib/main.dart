@@ -8,7 +8,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  var email = prefs.getString('email');
+  var token = prefs.getString('token');
 
   runApp(
       MaterialApp(
@@ -17,7 +17,7 @@ Future<void> main() async {
           theme: ThemeData(
             primaryColor: Colors.black,
           ),
-          home: email == null ? LoginPage() : MyHomePage()
+          home: token == null ? LoginPage() : MyHomePage()
       )
   );
 }
