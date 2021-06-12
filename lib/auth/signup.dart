@@ -11,16 +11,18 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String? errorMessage = '';
-  String? successMessage = '';
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
-  String? _emailId;
-  String? _password;
-  String _userName='';
   final _emailIdController = TextEditingController(text: '');
   final _userNameController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
   final _confirmPasswordController = TextEditingController(text: '');
+
+  String? errorMessage = '';
+  String? successMessage = '';
+  String? _emailId;
+  String? _password;
+  String _userName='';
+  bool hasLoaded = true;
 
     Future<User?> signUp (email, password) async {
       try {
@@ -195,17 +197,21 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: () {
                         if (_formStateKey.currentState!.validate()) {
                           _formStateKey.currentState!.save();
+                          setState(()=>hasLoaded = false);
                           signUp(_emailId, _password).then((user) {
                             if (user != null) {
                               print('Registered Successfully.');
                               setState(() {
                                 successMessage = 'Registered Successfully';
                               });
+                              setState(()=>hasLoaded = true);
                               Navigator.pushReplacement(context,
                                 MaterialPageRoute(
                                     builder: (context) => LoginPage()
                                 ),
-                              );                            } else {
+                              );
+                            } else {
+                              setState(()=>hasLoaded = true);
                               print('Error while Login.');
                               setState(() {
                                 errorMessage = 'Error while Login.';
@@ -221,7 +227,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
-                (successMessage != '' ? Text(
+                hasLoaded==false ?  Center(child: CircularProgressIndicator())
+                 : (successMessage != '' ? Text(
                   successMessage.toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 15, color: Colors.green),

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_flutter_project/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {

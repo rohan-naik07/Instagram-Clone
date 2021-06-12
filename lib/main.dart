@@ -1,24 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:first_flutter_project/auth/login.dart';
 import 'package:first_flutter_project/home/home.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:first_flutter_project/start.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  var token = prefs.getString('token');
-
   runApp(
       MaterialApp(
+        title: 'Instagram Clone',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: Colors.black,
+        ),
+        home: SplashApp(
+          key: UniqueKey(),
+          onInitializationComplete: (token) => runMainApp(token),
+        ),
+      )
+  );
+}
+
+void runMainApp(token) {
+  if(token!=null){
+    runApp(
+        MaterialApp(
           title: 'Instagram Clone',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             primaryColor: Colors.black,
           ),
-          home: token == null ? LoginPage() : MyHomePage()
-      )
-  );
+          home: MyHomePage(),
+        )
+    );
+  } else {
+    runApp(
+        MaterialApp(
+          title: 'Instagram Clone',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primaryColor: Colors.black,
+          ),
+          home: LoginPage(),
+        )
+    );
+  }
 }
 

@@ -12,14 +12,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   final _emailIdController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
-  final FirebaseAuth auth = FirebaseAuth.instance;
+
   String? errorMessage = '';
   String? successMessage = '';
-  final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   String? _emailId;
   String? _password;
+  bool hasLoaded = true;
 
   Future<void> setCredentials (token,id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -160,10 +162,12 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     if (_formStateKey.currentState!.validate()) {
                       _formStateKey.currentState!.save();
+                      setState(()=>hasLoaded = false);
                       signIn(_emailId, _password).then((user) {
                         if (user != null) {
                           setState(() {
                             successMessage = 'Logged In Successfully';
+                            hasLoaded = true;
                           });
                           setCredentials(user.getIdToken().toString(), user.uid)
                               .then((value) => {
@@ -172,9 +176,11 @@ class _LoginPageState extends State<LoginPage> {
                                       builder: (context) => MyHomePage()
                                     ),
                                   )
-                              });
+                                }
+                              );
                         } else {
                           print('Error while Login.');
+                          setState(()=>hasLoaded = true);
                           setState(() {
                             errorMessage = 'Error while Login.';
                           });
@@ -196,10 +202,11 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ),
-            (successMessage != '' ? Text(
-              successMessage.toString(),
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15, color: Colors.green),
+            hasLoaded==false ? Center(child: CircularProgressIndicator())
+            : (successMessage != '' ? Text(
+                successMessage.toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.green),
             ) : errorMessage !='' ? Text(
                 successMessage.toString(),
                 textAlign: TextAlign.center,
