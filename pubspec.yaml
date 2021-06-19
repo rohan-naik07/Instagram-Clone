@@ -32,6 +32,15 @@ dependencies:
   firebase_core: "^1.3.0"
   cloud_firestore: "^2.2.2"
   firebase_auth: "^1.4.1"
+  firebase_storage: "^8.1.3"
+  carousel_slider: ^3.0.0
+  image_picker:
+  camera:
+  flutter_absolute_path:
+  path_provider:
+  path:
+  provider: ^5.0.0
+  multi_image_picker: ^4.6.9
 
 dev_dependencies:
   flutter_test:

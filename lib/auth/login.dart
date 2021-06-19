@@ -23,10 +23,10 @@ class _LoginPageState extends State<LoginPage> {
   String? _password;
   bool hasLoaded = true;
 
-  Future<void> setCredentials (token,id) async {
+  Future<void> setCredentials (token,email) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('token', token);
-    prefs.setString('user-id', id);
+    prefs.setString('user-email', email);
   }
 
   Future<User?> signIn (email, password) async {
@@ -35,32 +35,19 @@ class _LoginPageState extends State<LoginPage> {
           email: email.toString(),
           password: password.toString()
       );
-
-      assert(user != null);
-      assert(await user.user!.getIdToken() != null);
-      final User currentUser = await auth.currentUser!;
-      assert(user.user!.uid.toString() == currentUser.uid);
       return user.user;
-    } on PlatformException catch (e) {
-      handleError(e);
-      return null;
+    } on PlatformException catch(error){
+      throw error;
     }
   }
 
   handleError(PlatformException error) {
+    print('error');
     print(error);
-    switch (error.code) {
-      case 'ERROR_USER_NOT_FOUND':
-        setState(() {
-          errorMessage = 'User Not Found!!!';
-        });
-        break;
-      case 'ERROR_WRONG_PASSWORD':
-        setState(() {
-          errorMessage = 'Wrong Password!!!';
-        });
-        break;
-    }
+    setState(() {
+      errorMessage = error.message;
+      hasLoaded = true;
+    });
   }
 
   String? validateEmail(String? value) {
@@ -68,14 +55,14 @@ class _LoginPageState extends State<LoginPage> {
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern.toString());
     if (value.toString().isEmpty || !regex.hasMatch(value.toString()))
-      return 'Enter Valid Email Id!!!';
+      return 'Enter Valid Email Id';
     else
       return null;
   }
 
   String? validatePassword(String? value) {
     if (value.toString().trim().isEmpty || value.toString().length < 6 || value.toString().length > 14) {
-      return 'Minimum 6 & Maximum 14 Characters!!!';
+      return 'Minimum 6 & Maximum 14 Characters';
     }
     return null;
   }
@@ -163,29 +150,33 @@ class _LoginPageState extends State<LoginPage> {
                     if (_formStateKey.currentState!.validate()) {
                       _formStateKey.currentState!.save();
                       setState(()=>hasLoaded = false);
-                      signIn(_emailId, _password).then((user) {
-                        if (user != null) {
-                          setState(() {
-                            successMessage = 'Logged In Successfully';
-                            hasLoaded = true;
-                          });
-                          setCredentials(user.getIdToken().toString(), user.uid)
-                              .then((value) => {
-                                  Navigator.pushReplacement(context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MyHomePage()
-                                    ),
-                                  )
-                                }
-                              );
-                        } else {
-                          print('Error while Login.');
-                          setState(()=>hasLoaded = true);
-                          setState(() {
-                            errorMessage = 'Error while Login.';
-                          });
-                        }
+                      try {
+                        signIn(_emailId, _password).then((user) {
+                          if (user != null) {
+                            setState(() {
+                              successMessage = 'Logged In Successfully';
+                              hasLoaded = true;
+                            });
+                            setCredentials(user.getIdToken().toString(), _emailId)
+                                .then((value) => {
+                                    Navigator.pushReplacement(context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MyHomePage()
+                                      ),
+                                    )
+                                  }
+                                );
+                          } else {
+                            print('Error while Login.');
+                            setState(()=>hasLoaded = true);
+                            setState(() {
+                              errorMessage = 'Error while Login.';
+                            });
+                          }
                       });
+                      } on PlatformException catch (e) {
+                        handleError(e);
+                      }
                     }
                   },
                   child: Text(

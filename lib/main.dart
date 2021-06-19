@@ -21,7 +21,6 @@ void main() {
 }
 
 void runMainApp(token) {
-  if(token!=null){
     runApp(
         MaterialApp(
           title: 'Instagram Clone',
@@ -29,20 +28,8 @@ void runMainApp(token) {
           theme: ThemeData(
             primaryColor: Colors.black,
           ),
-          home: MyHomePage(),
+          home: token!=null ? MyHomePage() : LoginPage(),
         )
     );
-  } else {
-    runApp(
-        MaterialApp(
-          title: 'Instagram Clone',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primaryColor: Colors.black,
-          ),
-          home: LoginPage(),
-        )
-    );
-  }
 }
 

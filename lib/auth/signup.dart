@@ -1,8 +1,11 @@
 import 'package:first_flutter_project/auth/login.dart';
+import 'package:first_flutter_project/futils/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -11,9 +14,11 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final Firestore firestore = new Firestore();
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   final _emailIdController = TextEditingController(text: '');
   final _userNameController = TextEditingController(text: '');
+  final _bioController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
   final _confirmPasswordController = TextEditingController(text: '');
 
@@ -22,9 +27,41 @@ class _SignUpPageState extends State<SignUpPage> {
   String? _emailId;
   String? _password;
   String _userName='';
-  bool hasLoaded = true;
+  String _bio='';
 
-    Future<User?> signUp (email, password) async {
+  bool hasLoaded = true;
+  File? imageFile;
+
+  Future<void> _showSelectionDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Text("From where do you want to take the photo?"),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    GestureDetector(
+                      child: Text("Gallery"),
+                      onTap: () {
+                        _openGallery(context);
+                      },
+                    )
+                  ],
+                ),
+              ));
+        });
+    }
+
+  _openGallery(BuildContext context) async {
+    var picture = await ImagePicker().getImage(source: ImageSource.gallery);
+    this.setState(() {
+      imageFile = File(picture!.path);
+    });
+    Navigator.of(context).pop();
+  }
+
+  Future<User?> signUp (email, password) async {
       try {
         UserCredential user = await auth.createUserWithEmailAndPassword(
             email: email.toString(),
@@ -58,7 +95,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
     String? validateEmail(String? value) {
       Pattern pattern =
-          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|'
+          r'(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]'
+          r'{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
       RegExp regex = new RegExp(pattern.toString());
       if (value.toString().isEmpty || !regex.hasMatch(value.toString()))
         return 'Enter Valid Email Id!!!';
@@ -92,13 +131,21 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: const EdgeInsets.only(top: 60.0),
                   child: Center(
                     child: Container(
-                      width: 200,
-                      height: 150,
-                      child: Image.asset(
-                        "assets/images/signup.png",
-                        fit: BoxFit.contain,
-                        height: 42,
-                      ),
+                      width: 100,
+                      height: 100,
+                      child: GestureDetector(
+                        onTap: () async { await _showSelectionDialog(context); },
+                        child : imageFile != null ? Image.file(
+                          imageFile!,
+                          fit: BoxFit.contain,
+                          height: 42,
+                        ) :
+                        Image.asset(
+                          "assets/images/signup.png",
+                          fit: BoxFit.contain,
+                          height: 42,
+                        ),
+                      )
                     ),
                   ),
                 ),
@@ -180,6 +227,23 @@ class _SignUpPageState extends State<SignUpPage> {
                                 )
                             ),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 15.0, right: 15.0, top: 15, bottom: 0),
+                            child: TextFormField(
+                                controller: _bioController,
+                                onSaved: (value) => _bio = value!,
+                                style: TextStyle(color: Colors.white),
+                                maxLines: 10,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  fillColor: Colors.white10,
+                                  filled: true,
+                                  hintText: 'Add your Bio',
+                                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+                                )
+                            ),
+                          ),
                         ]
                     )
                 ),
@@ -194,22 +258,30 @@ class _SignUpPageState extends State<SignUpPage> {
                         borderRadius: BorderRadius.circular(10)
                     ),
                     child: TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formStateKey.currentState!.validate()) {
                           _formStateKey.currentState!.save();
                           setState(()=>hasLoaded = false);
-                          signUp(_emailId, _password).then((user) {
+                          signUp(_emailId, _password).then((user) async {
+                            String? url = await firestore.uploadPhoto(imageFile!, this._userName!);
                             if (user != null) {
-                              print('Registered Successfully.');
-                              setState(() {
-                                successMessage = 'Registered Successfully';
+                              firestore.addUser(_userName,_emailId,_bio,url).then((value) {
+                                setState(() {
+                                  successMessage = 'Registered Successfully';
+                                });
+                                setState(()=>hasLoaded = true);
+                                Navigator.pushReplacement(context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LoginPage()
+                                  ),
+                                );
+                              }).catchError((error) {
+                                print("Failed to add user: $error");
+                                setState(()=>{
+                                  hasLoaded = true,
+                                  errorMessage = "Failed to add user: $error"
+                                });
                               });
-                              setState(()=>hasLoaded = true);
-                              Navigator.pushReplacement(context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()
-                                ),
-                              );
                             } else {
                               setState(()=>hasLoaded = true);
                               print('Error while Login.');
