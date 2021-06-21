@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:camera/camera.dart';
+import 'package:first_flutter_project/posts/create/submit.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:flutter_absolute_path/flutter_absolute_path.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'ImageModel.dart';
+import 'camera.dart';
 
 class PhotosPage extends StatefulWidget {
   @override
@@ -20,14 +23,14 @@ class _PhotosState extends State<PhotosPage> {
         child: SizedBox(
           height: 200,
           child: GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount: 3,
             children: List.generate(images.length, (index) {
               File file = images.get(index);
               return Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(5.0),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular (15)),
-                  child: Image.file(file,width: 100,height: 100) // AssetThumb
+                  borderRadius: BorderRadius.all(Radius.circular (10)),
+                  child: Image.file(file) // AssetThumb
                 ),
               );
             }),
@@ -77,6 +80,23 @@ class _PhotosState extends State<PhotosPage> {
     return file;
   }
 
+  Future<CameraDescription> initCamera() async {
+    // Obtain a list of the available cameras on the device.
+    final cameras = await availableCameras();
+    // Get a specific camera from the list of available cameras.
+    final firstCamera = cameras.first;
+    return firstCamera;
+  }
+
+  takePic () async{
+    CameraDescription camera = await initCamera();
+    Navigator.push(context,
+      MaterialPageRoute(
+          builder: (context) => TakePictureScreen(camera:camera)
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var photos = context.watch<ImageModel>();
@@ -90,7 +110,7 @@ class _PhotosState extends State<PhotosPage> {
                     child: Row(
                       children: <Widget>[
                         IconButton(
-                            onPressed: ()=>Navigator.pushNamed(context, '/takepic'),
+                            onPressed: () async { await takePic(); },
                             icon: Icon(
                               Icons.camera_alt_rounded,
                               color: Colors.white,
@@ -112,7 +132,11 @@ class _PhotosState extends State<PhotosPage> {
                           ),
                         ),
                         TextButton(
-                          onPressed: ()=>Navigator.pushNamed(context, '/submit'),
+                          onPressed: ()=>Navigator.push(context,
+                            MaterialPageRoute(
+                                builder: (context) => SubmitPage()
+                            ),
+                          ),
                           child:Container(
                             height: 20,
                             width: 60,

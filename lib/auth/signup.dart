@@ -14,7 +14,7 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuth auth = FirebaseAuth.instance;
-  final Firestore firestore = new Firestore();
+  final Auth instance = new Auth();
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   final _emailIdController = TextEditingController(text: '');
   final _userNameController = TextEditingController(text: '');
@@ -263,9 +263,9 @@ class _SignUpPageState extends State<SignUpPage> {
                           _formStateKey.currentState!.save();
                           setState(()=>hasLoaded = false);
                           signUp(_emailId, _password).then((user) async {
-                            String? url = await firestore.uploadPhoto(imageFile!, this._userName!);
+                            String? url = await instance.uploadPhoto(imageFile!, this._userName);
                             if (user != null) {
-                              firestore.addUser(_userName,_emailId,_bio,url).then((value) {
+                              instance.addUser(_userName,_emailId,_bio,url).then((value) {
                                 setState(() {
                                   successMessage = 'Registered Successfully';
                                 });
