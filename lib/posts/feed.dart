@@ -1,10 +1,11 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_flutter_project/auth/login.dart';
 import 'package:first_flutter_project/futils/posts.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FeedPage extends StatefulWidget {
   @override
@@ -13,18 +14,18 @@ class FeedPage extends StatefulWidget {
 
 class _FeedPageState extends State<FeedPage> {
   Widget? renderPost (post){
-    List<Widget> images = [];
-    post['images'].map((var image)=>images.add(Image.network(image)));
+    List<String> images = [];
+    post['images'].forEach((image)=>images.add(image));
     return Padding(
-        padding: EdgeInsets.all(20.0),
+        padding: EdgeInsets.only(left: 5,right: 5),
         child: Column(
-            children: <Widget>[
+            children: <Widget> [
               Padding(
-                padding: const EdgeInsets.only(bottom: 20.0,top: 20.0),
+                padding: const EdgeInsets.only(bottom: 20.0,top:10),
                 child : Row(
                   children: [
                     CircleAvatar(
-                      radius: 25.0,
+                      radius: 20.0,
                       backgroundImage:
                       NetworkImage("${post['photoUrl']}"),
                       backgroundColor: Colors.transparent,
@@ -43,7 +44,7 @@ class _FeedPageState extends State<FeedPage> {
                                   '${post['user_name']}',
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 20
+                                      fontSize: 15
                                   ),
                                 ),
                               )
@@ -70,13 +71,89 @@ class _FeedPageState extends State<FeedPage> {
                         return Container(
                             width: MediaQuery.of(context).size.width,
                             margin: EdgeInsets.symmetric(horizontal: 5.0),
-                            child: image,
+                            child: Image.memory(base64Decode(image),width: 100,height: 100)
                         );
                       },
                     );
                   }).toList(),
                 ),
               ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: null,
+                    icon: Icon(
+                      Icons.favorite_border,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Expanded(child: Container()),
+                  IconButton(
+                    onPressed: null,
+                    icon: Icon(
+                      Icons.bookmark,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  )
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${post['description']}',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15
+                    ),
+                  ),
+                  Text(
+                    '${post['likes'].length} likes',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10, bottom: 10),
+                            child: TextField(
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                fillColor: Colors.white10,
+                                filled: true,
+                                hintText: 'Add your comment',
+                                hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                      ),
+                      IconButton(
+                        onPressed: null,
+                        icon: Icon(
+                          Icons.send,
+                          size: 40,
+                          color: Colors.white,
+                        ),
+                      )
+                    ],
+                  ),
+                  Text(
+                    '${post['date']}',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10
+                    ),
+                  ),
+                ],
+              )
             ]
         )
     );

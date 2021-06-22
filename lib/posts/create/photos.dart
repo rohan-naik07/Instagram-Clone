@@ -25,12 +25,12 @@ class _PhotosState extends State<PhotosPage> {
           child: GridView.count(
             crossAxisCount: 3,
             children: List.generate(images.length, (index) {
-              File file = images.get(index);
+              String file = images.get(index);
               return Padding(
                 padding: EdgeInsets.all(5.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular (10)),
-                  child: Image.file(file) // AssetThumb
+                  child: FittedBox(
+                    child: Image.memory(base64Decode(file),width: 100,height: 100,),
+                    fit: BoxFit.fill,
                 ),
               );
             }),
@@ -51,6 +51,7 @@ class _PhotosState extends State<PhotosPage> {
       );
   }
 
+
   loadAssets() async {
     String error = 'No Error Dectected';
     try {
@@ -63,8 +64,9 @@ class _PhotosState extends State<PhotosPage> {
       assetList.forEach((element) async {
         final filePath = await FlutterAbsolutePath.getAbsolutePath(element.identifier);
         File file = await getImageFileFromAsset(filePath);
+        String base64Image = base64Encode(file.readAsBytesSync());
         var photos = context.read<ImageModel>();
-        photos.add(file);
+        photos.add(base64Image);
       });
     } on Exception catch (e) {
       error = e.toString();
@@ -105,50 +107,47 @@ class _PhotosState extends State<PhotosPage> {
           return Container(
               child: Column (
                 children: <Widget> [
-                  Padding (
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                    child : Row(
                       children: <Widget>[
                         IconButton(
                             onPressed: () async { await takePic(); },
                             icon: Icon(
                               Icons.camera_alt_rounded,
                               color: Colors.white,
-                            )
+                            ),
+                          color: Colors.blue,
                         ),
-                        TextButton(
-                          onPressed: () async { await loadAssets(); },
-                          child:Container(
-                            height: 20,
-                            width: 60,
+                          Container(
+                            height: 40,
+                            margin: EdgeInsets.all(10),
+                            width: 100,
                             decoration: BoxDecoration(
                                 color: Colors.grey,
                                 borderRadius: BorderRadius.circular(10)
                             ),
-                            child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child : Text( 'Select From Gallery', style: TextStyle(color: Colors.white, fontSize: 10))
+                            child: TextButton(
+                                onPressed: () async { await loadAssets(); },
+                                child :Text('Gallery',style: TextStyle(color: Colors.white, fontSize: 15))
                             ),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: ()=>Navigator.push(context,
-                            MaterialPageRoute(
-                                builder: (context) => SubmitPage()
-                            ),
-                          ),
-                          child:Container(
-                            height: 20,
-                            width: 60,
+                          Expanded(child: Container()),
+                          Container(
+                            height: 40,
+                            width: 100,
                             decoration: BoxDecoration(
                                 color: Colors.blue,
                                 borderRadius: BorderRadius.circular(10)
                             ),
-                            child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child : Text( 'Next', style: TextStyle(color: Colors.white, fontSize: 10))
+                            child:TextButton(
+                                child: Text( 'Next', style: TextStyle(color: Colors.white, fontSize: 15)),
+                                onPressed: ()=>Navigator.push(context,
+                                MaterialPageRoute(
+                                  builder: (context) => SubmitPage()
+                                ),
                             ),
-                          ),
+                          )
                         )
                       ],
                     ),

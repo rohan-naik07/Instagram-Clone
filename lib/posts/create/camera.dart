@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'ImageModel.dart';
+import 'dart:convert';
 
 // A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
@@ -64,14 +65,12 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         // Provide an onPressed callback.
         onPressed: () async {
           try {
-            // Ensure that the camera is initialized.
             await _initializeControllerFuture;
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
             final xfile = await _controller.takePicture();
             final image = File(xfile.path);
             var photos = context.read<ImageModel>();
-            photos.add(image);
+            String base64Image = base64Encode(image.readAsBytesSync());
+            photos.add(base64Image);
             Navigator.pop(context);
           } catch (e) {
             // If an error occurs, log the error to the console.

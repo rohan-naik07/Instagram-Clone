@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/futils/posts.dart';
+import 'package:first_flutter_project/posts/feed.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -20,7 +22,7 @@ class _SubmitState extends State<SubmitPage> {
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController(text: '');
   String? errorMessage = '';
-  String? _description;
+  String _description = '';
   bool hasLoaded = true;
 
   Future<dynamic> getUser() async {
@@ -30,17 +32,18 @@ class _SubmitState extends State<SubmitPage> {
     return user;
   }
 
-  Future<void> submitPost(var user,List<File> photos) async {
-    List<String> images = [];
+  Future<void> submitPost(var user,List<String> photos) async {
     setState(() {
       hasLoaded = false;
     });
+    //print(_description);
 
     try{
-      images = await Post().uploadImages(photos,user['user_name'], date);
-      await Post().addPost(user['user_name'], user['photoUrl'] , images, "test description",date);
+      await Post().addPost(user['user_name'], user['photoUrl'] ,photos,_description,date);
+      Navigator.pop(context);
     } on FirebaseException catch(error) {
       print(error.message);
+
       setState(() {
         hasLoaded = true;
         errorMessage = error.message;
@@ -125,13 +128,13 @@ class _SubmitState extends State<SubmitPage> {
                             initialPage: 0,
                             enableInfiniteScroll: false,
                           ),
-                          items: photos.photos.map((file) {
+                          items: photos.photos.map((image) {
                             return Builder(
                               builder: (BuildContext context) {
                                 return Container(
                                     width: MediaQuery.of(context).size.width,
                                     margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                    child: Image.file(file,width: 100,height: 100)
+                                    child: Image.memory(base64Decode(image),width: 100,height: 100)
                                 );
                               },
                             );
@@ -143,8 +146,8 @@ class _SubmitState extends State<SubmitPage> {
                         child : Padding(
                           padding: EdgeInsets.symmetric(horizontal: 15),
                           child: TextFormField(
-                            onSaved: (value) {
-                              _description= value;
+                            onChanged: (value) {
+                              _description= value!;
                             },
                             controller: _descriptionController,
                             style: TextStyle(color: Colors.white),
@@ -168,7 +171,7 @@ class _SubmitState extends State<SubmitPage> {
                               borderRadius: BorderRadius.circular(10)
                           ),
                           child: TextButton(
-                            onPressed: () async { await submitPost(user,photos.photos); },
+                            onPressed: () async { await submitPost(user,photos.photos);},
                             child: Text(
                               'Post!',
                               style: TextStyle(color: Colors.white, fontSize: 20),
