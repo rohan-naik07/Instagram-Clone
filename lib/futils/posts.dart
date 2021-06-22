@@ -59,4 +59,20 @@ class Post{
 
     return uploadUrls;
   }
+
+  Future<dynamic> getUserProfileInfo (name) async {
+    var user = await Firestore.getInstance()!.collection("users").where('user_name',isEqualTo:name).get();
+    var posts = await Firestore.getInstance()!.collection("posts").where('user_name',isEqualTo:name).get();
+    return {
+      "email" : user.docs[0]['email'],
+      "user_name" : user.docs[0]['user_name'],
+      "photoUrl" : user.docs[0]['photoUrl'],
+      "bio" : user.docs[0]['bio'],
+      "no_of_posts" : posts.docs.length,
+      "followers" :  user.docs[0]['connections'].length ,
+      "following" :  user.docs[0]['connections'].length,
+      "posts" : posts.docs,
+    };
+  }
+
 }

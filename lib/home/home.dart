@@ -1,5 +1,6 @@
 import 'package:first_flutter_project/posts/create/photos.dart';
 import 'package:first_flutter_project/posts/feed.dart';
+import 'package:first_flutter_project/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -15,7 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
     FeedPage(),
     PhotosPage(),
     Text('Search Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Profile Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    ProfilePage(user_name: "rohan07"),
   ];
 
   void _onItemTapped(int index) {
@@ -60,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 backgroundColor: Colors.black
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.add_box_outlined),
+                icon: Icon(Icons.add_box_outlined,),
                 label : 'Add',
                 backgroundColor: Colors.black
             ),

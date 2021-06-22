@@ -19,7 +19,7 @@ class Auth {
   }
 
   Future<dynamic> getUser (email) async {
-    var user = await Firestore.getInstance()!.collection("users")!.where('email',isEqualTo: email).get();
+    var user = await Firestore.getInstance()!.collection("users").where('email',isEqualTo: email).get();
     return {
       "email" : user.docs[0]['email'],
       "user_name" : user.docs[0]['user_name'],
@@ -29,7 +29,8 @@ class Auth {
 
   Future<String> uploadPhoto(File file,String user_name) async {
     try {
-      await Firestore.getStorageInstance()!.ref('uploads/profile_images/${user_name}.jpg').putFile(file);
+      await Firestore.getStorageInstance()!
+      .ref('uploads/profile_images/${user_name}.jpg').putFile(file);
     } on FirebaseException catch (e) {
       throw e;
     }
@@ -42,7 +43,8 @@ class Auth {
   }
 
   Future<String> downloadURL(String user_name) async {
-    String downloadURL = await Firestore.getStorageInstance()!.ref('uploads/profile_images/${user_name}.jpg').getDownloadURL();
+    String downloadURL = await Firestore.getStorageInstance()!
+    .ref('uploads/profile_images/${user_name}.jpg').getDownloadURL();
     return downloadURL;
   }
 

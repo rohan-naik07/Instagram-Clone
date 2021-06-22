@@ -147,7 +147,7 @@ class _SubmitState extends State<SubmitPage> {
                           padding: EdgeInsets.symmetric(horizontal: 15),
                           child: TextFormField(
                             onChanged: (value) {
-                              _description= value!;
+                              _description= value;
                             },
                             controller: _descriptionController,
                             style: TextStyle(color: Colors.white),
