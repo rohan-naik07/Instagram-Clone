@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 class ImageModel extends ChangeNotifier {
@@ -22,6 +21,14 @@ class ImageModel extends ChangeNotifier {
     // you change the model.
     notifyListeners();
   }
+
+  void removeAll() {
+    _photos.clear();
+    // Don't forget to tell dependent widgets to rebuild _every time_
+    // you change the model.
+    notifyListeners();
+  }
+
 }
 
 

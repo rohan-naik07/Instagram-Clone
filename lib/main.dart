@@ -4,6 +4,7 @@ import 'package:first_flutter_project/auth/login.dart';
 import 'package:first_flutter_project/home/home.dart';
 import 'package:first_flutter_project/start.dart';
 import 'package:provider/provider.dart';
+import 'home/userInfo.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,21 +25,24 @@ void main() {
 
 void runMainApp(token) {
     runApp(
-        MultiProvider(
-            providers: [
-              ChangeNotifierProvider<ImageModel>(
-                  create: (context) => ImageModel()
-              ),
-            ],
-            child : MaterialApp(
-              title: 'Instagram Clone',
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                primaryColor: Colors.black,
-              ),
-              home: token!=null ? MyHomePage() : LoginPage(),
-            )
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ImageModel>(
+              create: (context) => ImageModel()
+          ),
+          ChangeNotifierProvider<UserModel>(
+              create: (context) => UserModel()
+          ),
+        ],
+        child : MaterialApp(
+          title: 'Instagram Clone',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primaryColor: Colors.black,
+          ),
+          home: token!=null ? MyHomePage() : LoginPage(),
         )
+      )
     );
 }
 

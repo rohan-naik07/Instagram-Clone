@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:first_flutter_project/futils/posts.dart';
+import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   final String user_name;
@@ -20,8 +21,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    var provider = context.read<UserModel>().info!;
+    var user = widget.user_name == "" ? provider['user_name'] : widget.user_name;
     return FutureBuilder(
-      future: post.getUserProfileInfo(widget.user_name),
+      future: post.getUserProfileInfo(user),
       builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
           if(snapshot.hasData){
             var info = snapshot.data;
@@ -84,12 +87,18 @@ class _ProfilePageState extends State<ProfilePage> {
                      ],
                   )
                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget> [
-                      Text('${info['email']}',style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold)),
-                      Text('${info['bio']}',style: TextStyle(color: Colors.white,fontSize: 15))
-                    ],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget> [
+                            Text('${info['email']}',style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold)),
+                            Text('${info['bio']}',style: TextStyle(color: Colors.white,fontSize: 15))
+                          ]
+                        )
+                      )
+                    ]
                   ),
                   Row(
                     children: [

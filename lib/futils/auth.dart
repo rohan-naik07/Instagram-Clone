@@ -5,10 +5,10 @@ import 'package:first_flutter_project/futils/instance.dart';
 
 class Auth {
 
-  Future<void> addUser(user_name,email,bio,url) {
+  Future<void> addUser(userName,email,bio,url) {
     // Call the user's CollectionReference to add a new user
     return Firestore.getInstance()!.collection("users").add({
-      'user_name': user_name,
+      'user_name': userName,
       'email': email,
       'bio': bio,
       'photoUrl': url,
@@ -27,24 +27,24 @@ class Auth {
     };
   }
 
-  Future<String> uploadPhoto(File file,String user_name) async {
+  Future<String> uploadPhoto(File file,String userName) async {
     try {
       await Firestore.getStorageInstance()!
-      .ref('uploads/profile_images/${user_name}.jpg').putFile(file);
+      .ref('uploads/profile_images/$userName.jpg').putFile(file);
     } on FirebaseException catch (e) {
       throw e;
     }
     try {
-      String url = await downloadURL(user_name);
+      String url = await downloadURL(userName);
       return url;
     } on FirebaseException catch (e) {
       throw e;
     }
   }
 
-  Future<String> downloadURL(String user_name) async {
+  Future<String> downloadURL(String userName) async {
     String downloadURL = await Firestore.getStorageInstance()!
-    .ref('uploads/profile_images/${user_name}.jpg').getDownloadURL();
+    .ref('uploads/profile_images/$userName.jpg').getDownloadURL();
     return downloadURL;
   }
 

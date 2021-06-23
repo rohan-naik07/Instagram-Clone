@@ -102,7 +102,6 @@ class _PhotosState extends State<PhotosPage> {
   @override
   Widget build(BuildContext context) {
     var photos = context.watch<ImageModel>();
-
     // TODO: implement build
           return Container(
               child: Column (
@@ -110,6 +109,7 @@ class _PhotosState extends State<PhotosPage> {
                   Padding(
                     padding: EdgeInsets.all(5),
                     child : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         IconButton(
                             onPressed: () async { await takePic(); },
@@ -132,7 +132,6 @@ class _PhotosState extends State<PhotosPage> {
                                 child :Text('Gallery',style: TextStyle(color: Colors.white, fontSize: 15))
                             ),
                           ),
-                          Expanded(child: Container()),
                           Container(
                             height: 40,
                             width: 100,

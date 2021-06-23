@@ -15,14 +15,13 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> removeCredentials () async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
-    prefs.remove('user-id');
+    prefs.remove('user-email');
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(

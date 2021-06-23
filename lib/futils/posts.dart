@@ -11,7 +11,7 @@ class Post{
       String description,
       DateTime date
       ) {
-    return Firestore.getInstance()!.collection("posts")!.add({
+    return Firestore.getInstance()!.collection("posts").add({
       'user_name': userName,
       'images': images,
       'description': description,
@@ -24,13 +24,13 @@ class Post{
   }
 
   Future<Object>? getPosts() async {
-    var posts = await Firestore.getInstance()!.collection("posts")!.get();
+    var posts = await Firestore.getInstance()!.collection("posts").get();
     return posts.docs;
   }
 
   Future<List<String>> uploadImages(
       List<File> images,
-      String user_name,
+      String userName,
       var date
       ) async {
     List<String> uploadUrls = [];
@@ -41,7 +41,7 @@ class Post{
           String name = names[names.length-1];
           try {
             TaskSnapshot snapshot =  await Firestore.getStorageInstance()!.ref(
-                'uploads/posts/${user_name}/${date.toString()}/image_${name}.jpg'
+                'uploads/posts/$userName/${date.toString()}/image_$name.jpg'
             ).putFile(file);
 
             final String downloadUrl = await snapshot.ref.getDownloadURL();
@@ -73,6 +73,11 @@ class Post{
       "following" :  user.docs[0]['connections'].length,
       "posts" : posts.docs,
     };
+  }
+
+  Future<dynamic> updatePost (var id,var update) async {
+    var posts = await Firestore.getInstance()!.collection("posts").doc(id).update(update);
+    return posts;
   }
 
 }

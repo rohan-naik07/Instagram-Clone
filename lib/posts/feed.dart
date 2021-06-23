@@ -1,11 +1,10 @@
 import 'dart:convert';
-
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:first_flutter_project/auth/login.dart';
 import 'package:first_flutter_project/futils/posts.dart';
+import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FeedPage extends StatefulWidget {
   @override
@@ -13,7 +12,7 @@ class FeedPage extends StatefulWidget {
 }
 
 class _FeedPageState extends State<FeedPage> {
-  Widget? renderPost (post){
+  Widget? renderPost (post,user){
     List<String> images = [];
     post['images'].forEach((image)=>images.add(image));
     return Padding(
@@ -25,7 +24,7 @@ class _FeedPageState extends State<FeedPage> {
                 child : Row(
                   children: [
                     CircleAvatar(
-                      radius: 20.0,
+                      radius: 15.0,
                       backgroundImage:
                       NetworkImage("${post['photoUrl']}"),
                       backgroundColor: Colors.transparent,
@@ -79,6 +78,7 @@ class _FeedPageState extends State<FeedPage> {
                 ),
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     onPressed: null,
@@ -88,7 +88,6 @@ class _FeedPageState extends State<FeedPage> {
                       color: Colors.white,
                     ),
                   ),
-                  Expanded(child: Container()),
                   IconButton(
                     onPressed: null,
                     icon: Icon(
@@ -101,7 +100,6 @@ class _FeedPageState extends State<FeedPage> {
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     '${post['description']}',
@@ -119,17 +117,22 @@ class _FeedPageState extends State<FeedPage> {
                     ),
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                       CircleAvatar(
+                        radius: 15.0,
+                        backgroundImage:
+                        NetworkImage("${user['photoUrl']}"),
+                        backgroundColor: Colors.transparent,
+                      ),
                       Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 10, bottom: 10),
+                            padding: const EdgeInsets.only(top: 10, bottom: 10,left: 10),
                             child: TextField(
                               style: TextStyle(color: Colors.white),
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                fillColor: Colors.white10,
-                                filled: true,
-                                hintText: 'Add your comment',
+                                border: UnderlineInputBorder(),
+                                hintText: 'Add a comment....',
                                 hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
                               ),
                             ),
@@ -139,7 +142,7 @@ class _FeedPageState extends State<FeedPage> {
                         onPressed: null,
                         icon: Icon(
                           Icons.send,
-                          size: 40,
+                          size: 30,
                           color: Colors.white,
                         ),
                       )
@@ -161,6 +164,8 @@ class _FeedPageState extends State<FeedPage> {
 
   @override
   Widget build(BuildContext context) {
+    var infoProvider = context.read<UserModel>();
+    var user = infoProvider.info;
     return FutureBuilder<Object>(
         future: Post().getPosts(),
         builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
@@ -169,7 +174,7 @@ class _FeedPageState extends State<FeedPage> {
             return new ListView.builder(
                 itemCount: posts.length,
                 itemBuilder: (BuildContext ctxt, int index) {
-                  return renderPost(posts[index])!;
+                  return renderPost(posts[index],user)!;
                 }
             );
           }
