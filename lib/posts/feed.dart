@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
+import 'package:first_flutter_project/posts/comments.dart';
 import 'package:first_flutter_project/profile/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,17 +17,15 @@ class FeedPage extends StatefulWidget {
 class _FeedPageState extends State<FeedPage> {
   List<dynamic>? posts;
   Map<String,List<dynamic>>? likes;
+  Map<String,List<dynamic>>? comments;
   var user;
 
-  likePost(post) async {
+  void likePost(post) async {
     if(likes![post.id]!.contains(user['email'])){
-      print('disliked');
       likes![post.id]!.remove(user['email']);
     } else {
-      print('liked');
       likes![post.id]!.add(user['email']);
     }
-    print(likes![post.id]);
     setState(() {
       likes = likes;
     });
@@ -36,6 +35,7 @@ class _FeedPageState extends State<FeedPage> {
 
   Widget? renderPost (post,user){
     List<String> images = [];
+    final _commentController = TextEditingController(text: '');
     post['images'].forEach((image)=>images.add(image));
     return Padding(
         padding: EdgeInsets.only(left: 5,right: 5),
@@ -94,7 +94,6 @@ class _FeedPageState extends State<FeedPage> {
                     return Builder(
                       builder: (BuildContext context) {
                         return Container(
-                           margin: EdgeInsets.all(5),
                            decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: Image.memory(base64Decode(image)).image,
@@ -138,13 +137,6 @@ class _FeedPageState extends State<FeedPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${post['description']}',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15
-                    ),
-                  ),
-                  Text(
                     '${likes![post.id]!.length} likes',
                     style: TextStyle(
                         color: Colors.white,
@@ -152,6 +144,30 @@ class _FeedPageState extends State<FeedPage> {
                         fontWeight: FontWeight.bold
                     ),
                   ),
+                  Text(
+                    '${post['description']}',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15
+                    ),
+                  ),
+                  Padding(padding: const EdgeInsets.only(top:5.0)),
+                  post['comments'].length!=0 ? GestureDetector(
+                    onTap: (){
+                      Navigator.push(context,
+                        MaterialPageRoute(
+                          builder: (context) => CommentsPage(post:post)
+                        ),
+                      );
+                    },
+                    child: Text(
+                    'View all ${post['comments'].length} comments',
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15
+                      ),
+                    )
+                  ) : Container(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -165,6 +181,7 @@ class _FeedPageState extends State<FeedPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(top: 10, bottom: 10,left: 10),
                             child: TextField(
+                              controller: _commentController,
                               style: TextStyle(color: Colors.white),
                               decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
@@ -175,7 +192,21 @@ class _FeedPageState extends State<FeedPage> {
                           ),
                       ),
                       IconButton(
-                        onPressed: null,
+                        onPressed: (){
+                          var comment = {
+                            'comment' : _commentController.text,
+                            'post_id' : post.id,
+                            'user_name' : user['user_name'],
+                            'user-photo' : user['photoUrl'],
+                            'timestamp' : DateTime.now().toString()
+                          };
+                          Map<String,List<dynamic>>? updatedComments = comments;
+                          updatedComments![post.id]!.add(comment);
+                          setState(() {
+                            comments = updatedComments;
+                          });
+                          Post().updatePost(post.id, {'comments' : updatedComments[post.id]});
+                        },
                         icon: Icon(
                           Icons.send,
                           size: 30,
@@ -230,9 +261,12 @@ class _FeedPageState extends State<FeedPage> {
           if(snapshot.hasData){
             posts = snapshot.data;
             likes = new Map<String,List<dynamic>>();
-            snapshot.data.forEach((post){
-              likes![post.id] =  post['likes'];
+            comments = new Map<String,List<dynamic>>();
+            posts!.forEach((post) {
+              likes![post.id] = post['likes'];
+              comments![post.id] = post['comments'];
             });
+
             return new ListView.builder(
                 itemCount: posts!.length,
                 itemBuilder: (BuildContext ctxt, int index) {
@@ -240,7 +274,7 @@ class _FeedPageState extends State<FeedPage> {
                 }
             );
           }
-          return Container();
+          return Center(child: CircularProgressIndicator());
         }
       )
     );   

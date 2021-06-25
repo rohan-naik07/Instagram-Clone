@@ -80,4 +80,13 @@ class Post{
     return posts;
   }
 
+  Future<void> postComments(var comment) =>Firestore.getInstance()!.collection('comments').add(comment);
+  
+  Future<QuerySnapshot<Map<String,dynamic>>> getComments(var postId) =>
+    	Firestore.getInstance()!
+      .collection('comments')
+      .orderBy('post_id')
+      .where('user_name',isEqualTo:postId)
+      .get();
+
 }
