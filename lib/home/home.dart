@@ -21,7 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
     FeedPage(),
     PhotosPage(),
     SearchPage(),
-    ProfilePage(user_name: ""),
+    ProfilePage(userName: ""),
   ];
 
   void _onItemTapped(int index) {
@@ -46,26 +46,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: Image.asset(
-          "assets/images/insta_logo.png",
-          fit: BoxFit.contain,
-          height: 42,
-        ),
-        toolbarHeight: 78,
-        actions: [
-          Transform.rotate(
-              angle: 60 * math.pi / 180,
-              child: IconButton(
-                icon: Icon(
-                  Icons.details_sharp,
-                  color: Colors.white,
-                ),
-                onPressed: null,
-              )
-          )
-        ],
-      ),
       body: FutureBuilder<dynamic>(
         future: getUserInfo(context),
         builder: (context, snapshot) {

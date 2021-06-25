@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String user_name;
+  final String userName;
 
   const ProfilePage({
     Key? key,
-    required this.user_name,
+    required this.userName,
   }) : super(key: key);
 
   @override
@@ -20,17 +20,20 @@ class _ProfilePageState extends State<ProfilePage> {
   Post post = new Post();
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     var provider = context.read<UserModel>().info!;
-    var user = widget.user_name == "" ? provider['user_name'] : widget.user_name;
-    return FutureBuilder(
+    var user = widget.userName == "" ? provider['user_name'] : widget.userName;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(user, style: TextStyle(color: Colors.white, fontSize: 20)),
+        backgroundColor: Colors.black,
+      ),
+      backgroundColor: Colors.black,
+      body: FutureBuilder(
       future: post.getUserProfileInfo(user),
       builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
           if(snapshot.hasData){
             var info = snapshot.data;
-            return Scaffold(
-              backgroundColor: Colors.black, 
-              body : Column(
+            return Column(
                 children: <Widget> [
                  Padding(padding:const EdgeInsets.only(left: 10,right: 10),
                  child:  Row(
@@ -60,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               )
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.only(left: 10.0,right: 10.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget> [
@@ -87,34 +90,42 @@ class _ProfilePageState extends State<ProfilePage> {
                      ],
                   )
                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget> [
-                            Text('${info['email']}',style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold)),
-                            Text('${info['bio']}',style: TextStyle(color: Colors.white,fontSize: 15))
-                          ]
-                        )
-                      )
-                    ]
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
-                          child: OutlinedButton(
-                            onPressed: null,
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(width: 1.0, color: Colors.grey)
-                            ),
-                            child: const Text("Edit Profile",style: TextStyle(color: Colors.white,fontSize: 15)),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0,right: 10.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget> [
+                              Padding(padding: const EdgeInsets.only(top:5)),
+                              Text('${info['email']}',style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold)),
+                              Padding(padding: const EdgeInsets.only(top:5)),
+                              Text('${info['bio']}',style: TextStyle(color: Colors.white,fontSize: 15))
+                            ]
                           )
-                        ),
-                      )
-                    ],
+                        )
+                      ]
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
+                            child: OutlinedButton(
+                              onPressed: null,
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(width: 1.0, color: Colors.grey)
+                              ),
+                              child: const Text("Edit Profile",style: TextStyle(color: Colors.white,fontSize: 15)),
+                            )
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                    Expanded(
                       child: SizedBox(
@@ -122,24 +133,29 @@ class _ProfilePageState extends State<ProfilePage> {
                         child:GridView.count(
                           crossAxisCount: 3,
                           children: List.generate(info['posts'].length, (index) {
-                            var post = info['posts'][index];
+                            String file = info['posts'][index]['images'][0];
                             return Padding(
                               padding: EdgeInsets.all(5.0),
-                                child: FittedBox(
-                                  child: Image.memory(base64Decode(post['images'][0]),width: 100,height: 100,),
-                                  fit: BoxFit.fill,
-                              ),
+                                child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: Image.memory(base64Decode(file)).image,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                child: null
+                              )
                             );
                           }),
                         )
                       )
                    )
                 ]
-              )
-            );
+              );
           }
           return Container();
         }
+      ),
     );
   } 
 }

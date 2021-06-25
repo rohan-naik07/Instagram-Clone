@@ -32,7 +32,7 @@ class _SubmitState extends State<SubmitPage> {
     return user;
   }
 
-  Future<void> submitPost(var user,List<String> photos) async {
+  Future<void> submitPost(var user,List<String> photos,BuildContext context) async {
     setState(() {
       hasLoaded = false;
     });
@@ -40,6 +40,8 @@ class _SubmitState extends State<SubmitPage> {
 
     try{
       await Post().addPost(user['user_name'], user['photoUrl'] ,photos,_description,date);
+      var imageModel = context.read<ImageModel>();
+      imageModel.removeAll();
       Navigator.pop(context);
     } on FirebaseException catch(error) {
       print(error.message);
@@ -61,18 +63,12 @@ class _SubmitState extends State<SubmitPage> {
           var user = snapshot.data;
           return Scaffold(
               backgroundColor: Colors.black,
-              appBar: AppBar(
-                title: Text('New Post', style: TextStyle(color: Colors.white, fontSize: 20)),
-                backgroundColor: Colors.black,
-              ),
               body : SingleChildScrollView(
                 child : Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Column(
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0,top: 20.0),
-                        child : Row(
+                      Row(
                           children: [
                             CircleAvatar(
                               radius: 25.0,
@@ -117,25 +113,29 @@ class _SubmitState extends State<SubmitPage> {
                             ),
                           ],
                         ),
-                      ),
                       Padding(
                         padding: EdgeInsets.all(5),
                         child : CarouselSlider(
                           options: CarouselOptions(
                             height: 400,
                             aspectRatio: 16/9,
-                            viewportFraction: 0.8,
+                            viewportFraction: 1.0,
                             initialPage: 0,
                             enableInfiniteScroll: false,
                           ),
                           items: photos.photos.map((image) {
                             return Builder(
                               builder: (BuildContext context) {
-                                return Container(
-                                    width: MediaQuery.of(context).size.width,
-                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                    child: Image.memory(base64Decode(image),width: 100,height: 100)
-                                );
+                                return  Container(
+                                margin: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: Image.memory(base64Decode(image)).image,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  child: null
+                              );
                               },
                             );
                           }).toList(),
@@ -171,7 +171,7 @@ class _SubmitState extends State<SubmitPage> {
                               borderRadius: BorderRadius.circular(10)
                           ),
                           child: TextButton(
-                            onPressed: () async { await submitPost(user,photos.photos);},
+                            onPressed: () async { await submitPost(user,photos.photos,context);},
                             child: Text(
                               'Post!',
                               style: TextStyle(color: Colors.white, fontSize: 20),

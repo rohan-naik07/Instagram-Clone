@@ -23,7 +23,7 @@ class Post{
     });
   }
 
-  Future<Object>? getPosts() async {
+  Future<dynamic>? getPosts() async {
     var posts = await Firestore.getInstance()!.collection("posts").get();
     return posts.docs;
   }

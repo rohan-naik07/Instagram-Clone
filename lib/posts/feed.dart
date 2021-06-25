@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
+import 'package:first_flutter_project/profile/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class FeedPage extends StatefulWidget {
   @override
@@ -12,6 +14,26 @@ class FeedPage extends StatefulWidget {
 }
 
 class _FeedPageState extends State<FeedPage> {
+  List<dynamic>? posts;
+  Map<String,List<dynamic>>? likes;
+  var user;
+
+  likePost(post) async {
+    if(likes![post.id]!.contains(user['email'])){
+      print('disliked');
+      likes![post.id]!.remove(user['email']);
+    } else {
+      print('liked');
+      likes![post.id]!.add(user['email']);
+    }
+    print(likes![post.id]);
+    setState(() {
+      likes = likes;
+    });
+
+    Post().updatePost(post.id,{"likes" : likes![post.id]});
+  }
+
   Widget? renderPost (post,user){
     List<String> images = [];
     post['images'].forEach((image)=>images.add(image));
@@ -19,9 +41,7 @@ class _FeedPageState extends State<FeedPage> {
         padding: EdgeInsets.only(left: 5,right: 5),
         child: Column(
             children: <Widget> [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0,top:10),
-                child : Row(
+              Row(
                   children: [
                     CircleAvatar(
                       radius: 15.0,
@@ -39,28 +59,34 @@ class _FeedPageState extends State<FeedPage> {
                               padding: const EdgeInsets.only(left: 8),
                               child: Material(
                                 type: MaterialType.transparency,
+                                child: TextButton(
+                                onPressed: (){
+                                   Navigator.push(context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProfilePage(userName:post['user_name'])
+                                      ),
+                                    );
+                                },
                                 child: Text(
-                                  '${post['user_name']}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15
+                                    '${post['user_name']}',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15
                                   ),
-                                ),
+                                )
                               )
+                            )
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-                child : CarouselSlider(
+              CarouselSlider(
                   options: CarouselOptions(
                     height: 400,
                     aspectRatio: 16/9,
-                    viewportFraction: 0.8,
+                    viewportFraction: 1.0,
                     initialPage: 0,
                     enableInfiniteScroll: false,
                   ),
@@ -68,25 +94,35 @@ class _FeedPageState extends State<FeedPage> {
                     return Builder(
                       builder: (BuildContext context) {
                         return Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Image.memory(base64Decode(image),width: 100,height: 100)
+                           margin: EdgeInsets.all(5),
+                           decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: Image.memory(base64Decode(image)).image,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            child: null,
                         );
                       },
                     );
                   }).toList(),
                 ),
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: null,
-                    icon: Icon(
+                    onPressed: () { likePost(post); },
+                    icon : post['likes'].contains(user['email']) ?
+                    Icon(
+                     Icons.favorite,
+                      size: 30,
+                      color: Colors.red,
+                    ) : 
+                    Icon(
                       Icons.favorite_border,
                       size: 30,
                       color: Colors.white,
-                    ),
+                    )
                   ),
                   IconButton(
                     onPressed: null,
@@ -109,7 +145,7 @@ class _FeedPageState extends State<FeedPage> {
                     ),
                   ),
                   Text(
-                    '${post['likes'].length} likes',
+                    '${likes![post.id]!.length} likes',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 15,
@@ -165,21 +201,48 @@ class _FeedPageState extends State<FeedPage> {
   @override
   Widget build(BuildContext context) {
     var infoProvider = context.read<UserModel>();
-    var user = infoProvider.info;
-    return FutureBuilder<Object>(
+    user = infoProvider.info;
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Image.asset(
+          "assets/images/insta_logo.png",
+          fit: BoxFit.contain,
+          height: 42,
+        ),
+        toolbarHeight: 78,
+        actions: [
+          Transform.rotate(
+              angle: 60 * math.pi / 180,
+              child: IconButton(
+                icon: Icon(
+                  Icons.details_sharp,
+                  color: Colors.white,
+                ),
+                onPressed: null,
+              )
+          )
+        ],
+      ),
+      body: FutureBuilder<dynamic>(
         future: Post().getPosts(),
         builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
           if(snapshot.hasData){
-            var posts = snapshot.data;
+            posts = snapshot.data;
+            likes = new Map<String,List<dynamic>>();
+            snapshot.data.forEach((post){
+              likes![post.id] =  post['likes'];
+            });
             return new ListView.builder(
-                itemCount: posts.length,
+                itemCount: posts!.length,
                 itemBuilder: (BuildContext ctxt, int index) {
-                  return renderPost(posts[index],user)!;
+                  return renderPost(posts![index],user)!;
                 }
             );
           }
           return Container();
         }
-    );
+      )
+    );   
   }
 }

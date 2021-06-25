@@ -27,6 +27,17 @@ class Auth {
     };
   }
 
+  Future<List<DocumentSnapshot>> getSuggestion(String searchkey) =>
+  Firestore.getInstance()!
+      .collection('users')
+      .orderBy('user_name')
+      .startAt([searchkey])
+      .endAt([searchkey + '\uf8ff'])
+      .get()
+      .then((snapshot) {
+        return snapshot.docs;
+      });
+
   Future<String> uploadPhoto(File file,String userName) async {
     try {
       await Firestore.getStorageInstance()!

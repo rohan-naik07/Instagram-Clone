@@ -28,10 +28,28 @@ class _PhotosState extends State<PhotosPage> {
               String file = images.get(index);
               return Padding(
                 padding: EdgeInsets.all(5.0),
-                  child: FittedBox(
-                    child: Image.memory(base64Decode(file),width: 100,height: 100,),
-                    fit: BoxFit.fill,
-                ),
+                  child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: Image.memory(base64Decode(file)).image,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment : MainAxisAlignment.end,
+                    crossAxisAlignment : CrossAxisAlignment.end,
+                    children : <Widget> [
+                      IconButton(
+                            onPressed: () {images.remove(file);},
+                            icon: Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
+                          color: Colors.blue,
+                      ),
+                    ]
+                  ),
+                )
               );
             }),
           )
@@ -50,7 +68,6 @@ class _PhotosState extends State<PhotosPage> {
         ),
       );
   }
-
 
   loadAssets() async {
     String error = 'No Error Dectected';
@@ -103,7 +120,13 @@ class _PhotosState extends State<PhotosPage> {
   Widget build(BuildContext context) {
     var photos = context.watch<ImageModel>();
     // TODO: implement build
-          return Container(
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('New Post', style: TextStyle(color: Colors.white, fontSize: 20)),
+              backgroundColor: Colors.black,
+            ),
+            backgroundColor: Colors.black,
+            body: Container(
               child: Column (
                 children: <Widget> [
                   Padding(
@@ -154,6 +177,7 @@ class _PhotosState extends State<PhotosPage> {
                   buildGridView(photos)!
                 ],
               )
-          );
+          ),
+      );
     }
 }
