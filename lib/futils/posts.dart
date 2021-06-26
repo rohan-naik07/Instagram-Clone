@@ -82,13 +82,15 @@ class Post{
     return posts;
   }
 
-  Future<void> postComments(var comment) =>Firestore.getInstance()!.collection('comments').add(comment);
+  Future<String> postComments(var comment) =>
+    Firestore.getInstance()!.collection('comments').add(comment).then((value) {
+      return value.id;
+    });
   
   Future<QuerySnapshot<Map<String,dynamic>>> getComments(var postId) =>
     	Firestore.getInstance()!
       .collection('comments')
-      .orderBy('post_id')
-      .where('user_name',isEqualTo:postId)
+      .where('post_id',isEqualTo:postId)
       .get();
 
 }

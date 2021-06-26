@@ -162,7 +162,7 @@ class _FeedPageState extends State<FeedPage> {
                       );
                     },
                     child: Text(
-                    'View all ${post['comments'].length} comments',
+                    'View all ${comments![post.id]!.length} comments',
                       style: TextStyle(
                           color: Colors.grey,
                           fontSize: 15
@@ -201,12 +201,18 @@ class _FeedPageState extends State<FeedPage> {
                             'user-photo' : user['photoUrl'],
                             'timestamp' : DateTime.now().toString()
                           };
-                          Map<String,List<dynamic>>? updatedComments = comments;
-                          updatedComments![post.id]!.add(comment);
-                          setState(() {
-                            comments = updatedComments;
-                          });
-                          Post().updatePost(post.id, {'comments' : updatedComments[post.id]});
+                          var postService = new Post();
+                          print('saving comment');
+                          postService.postComments(comment).then(
+                            (value) {
+                              comments![post.id]!.add(value);
+                              setState(() {
+                                comments = comments;
+                              });
+                              print('saving comment id');
+                              postService.updatePost(post.id, {'comments' : comments![post.id]});
+                            }
+                          );
                         },
                         icon: Icon(
                           Icons.send,
