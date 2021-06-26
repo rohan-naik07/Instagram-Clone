@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/profile/profile.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -72,7 +73,7 @@ class _SearchPageState extends State<SearchPage> {
                     decoration: BoxDecoration(
                       color: Colors.transparent,
                       image: DecorationImage(
-                        image: Image.memory(base64Decode(posts[index]['images'][0])).image,
+                        image: CachedNetworkImageProvider(posts[index]['images'][0]),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -186,7 +187,7 @@ class _SearchListState extends State<SearchList> {
                             child:Material(
                               type: MaterialType.transparency,
                               child: Text(
-                                '${users[index]['email']}',
+                                '${users[index]['fullName']}',
                                 style: TextStyle(
                                     color: Colors.grey[500],
                                     fontSize: 15

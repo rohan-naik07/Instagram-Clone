@@ -5,11 +5,12 @@ import 'package:first_flutter_project/futils/instance.dart';
 
 class Auth {
 
-  Future<void> addUser(userName,email,bio,url) {
+  Future<void> addUser(userName,fullName,email,bio,url) {
     // Call the user's CollectionReference to add a new user
     return Firestore.getInstance()!.collection("users").add({
       'user_name': userName,
       'email': email,
+      'fullName' : fullName,
       'bio': bio,
       'photoUrl': url,
       'connections':[],
@@ -21,6 +22,7 @@ class Auth {
   Future<dynamic> getUser (email) async {
     var user = await Firestore.getInstance()!.collection("users").where('email',isEqualTo: email).get();
     return {
+      "_id" : user.docs[0].id,
       "email" : user.docs[0]['email'],
       "user_name" : user.docs[0]['user_name'],
       "photoUrl" : user.docs[0]['photoUrl']

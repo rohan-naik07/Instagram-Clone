@@ -25,13 +25,13 @@ class _PhotosState extends State<PhotosPage> {
           child: GridView.count(
             crossAxisCount: 3,
             children: List.generate(images.length, (index) {
-              String file = images.get(index);
+              File file = images.get(index);
               return Padding(
                 padding: EdgeInsets.all(5.0),
                   child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: Image.memory(base64Decode(file)).image,
+                      image: Image.file(file).image,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -81,9 +81,8 @@ class _PhotosState extends State<PhotosPage> {
       assetList.forEach((element) async {
         final filePath = await FlutterAbsolutePath.getAbsolutePath(element.identifier);
         File file = await getImageFileFromAsset(filePath);
-        String base64Image = base64Encode(file.readAsBytesSync());
         var photos = context.read<ImageModel>();
-        photos.add(base64Image);
+        photos.add(file);
       });
     } on Exception catch (e) {
       error = e.toString();

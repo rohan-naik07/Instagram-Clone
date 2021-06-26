@@ -15,9 +15,11 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final Auth instance = new Auth();
+  int _index = 0;
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   final _emailIdController = TextEditingController(text: '');
   final _userNameController = TextEditingController(text: '');
+  final _fullNameController = TextEditingController(text: '');
   final _bioController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
   final _confirmPasswordController = TextEditingController(text: '');
@@ -27,6 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String? _emailId;
   String? _password;
   String _userName='';
+  String _fullName='';
   String _bio='';
 
   bool hasLoaded = true;
@@ -119,136 +122,129 @@ class _SignUpPageState extends State<SignUpPage> {
       return null;
     }
 
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        backgroundColor: Colors.black,
-        body: SingleChildScrollView(
-            child: Column(
-              children: <Widget> [
-                SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.only(top: 60.0),
-                  child: Center(
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      child: GestureDetector(
-                        onTap: () async { await _showSelectionDialog(context); },
-                        child : imageFile != null ? Image.file(
-                          imageFile!,
-                          fit: BoxFit.contain,
-                          height: 42,
-                        ) :
-                        Image.asset(
-                          "assets/images/signup.png",
-                          fit: BoxFit.contain,
-                          height: 42,
-                        ),
-                      )
-                    ),
-                  ),
-                ),
-                Form(
-                    autovalidateMode: AutovalidateMode.always, key: _formStateKey,
-                    child: Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 15.0, right: 15.0, top: 15, bottom: 0),
-                            child: TextFormField(
-                              onSaved: (value) {
-                                _userName = value.toString();
-                              },
-                              controller: _userNameController,
-                              style: TextStyle(color: Colors.white),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                fillColor: Colors.white10,
-                                filled: true,
-                                hintText: 'User Name',
-                                hintStyle: TextStyle(fontSize: 15, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 15.0, right: 15.0, top: 15, bottom: 0),
-                            child: TextFormField(
-                              validator: validateEmail,
-                              onSaved: (value) {
-                                _emailId = value;
-                              },
-                              keyboardType: TextInputType.emailAddress,
-                              controller: _emailIdController,
-                              style: TextStyle(color: Colors.white),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                fillColor: Colors.white10,
-                                filled: true,
-                                hintText: 'Email',
-                                hintStyle: TextStyle(fontSize: 15, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 15.0, right: 15.0, top: 15, bottom: 0),
-                            //padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: TextFormField(
-                                validator: validatePassword,
-                                onSaved: (value) => _password = value,
-                                controller: _passwordController,
-                                obscureText: true,
-                                style: TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  fillColor: Colors.white10,
-                                  filled: true,
-                                  hintText: 'Password',
-                                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
-                                )
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 15.0, right: 15.0, top: 15, bottom: 0),
-                            child: TextFormField(
-                                validator: validateConfirmPassword,
-                                controller: _confirmPasswordController,
-                                obscureText: true,
-                                style: TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  fillColor: Colors.white10,
-                                  filled: true,
-                                  hintText: 'Confirm Password',
-                                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
-                                )
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 15.0, right: 15.0, top: 15, bottom: 0),
-                            child: TextFormField(
-                                controller: _bioController,
-                                onSaved: (value) => _bio = value!,
-                                style: TextStyle(color: Colors.white),
-                                maxLines: 10,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  fillColor: Colors.white10,
-                                  filled: true,
-                                  hintText: 'Add your Bio',
-                                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
-                                )
-                            ),
-                          ),
-                        ]
-                    )
-                ),
+    Widget Step1 (){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
+            child: TextFormField(
+              validator: validateEmail,
+              onSaved: (value) {
+                _emailId = value;
+              },
+              keyboardType: TextInputType.emailAddress,
+              controller: _emailIdController,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                fillColor: Colors.white10,
+                filled: true,
+                hintText: 'Email',
+                hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
+            //padding: EdgeInsets.symmetric(horizontal: 15),
+            child: TextFormField(
+                validator: validatePassword,
+                onSaved: (value) => _password = value,
+                controller: _passwordController,
+                obscureText: true,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white10,
+                  filled: true,
+                  hintText: 'Password',
+                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+              )
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
+            child: TextFormField(
+                validator: validateConfirmPassword,
+                controller: _confirmPasswordController,
+                obscureText: true,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white10,
+                  filled: true,
+                  hintText: 'Confirm Password',
+                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+              )
+            ),
+          ),
+        ],
+      );
+    }
+  Widget Step2 (){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+        Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
+            child: TextFormField(
+              onSaved: (value) {
+                _userName = value.toString();
+              },
+              controller: _userNameController,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                fillColor: Colors.white10,
+                filled: true,
+                hintText: 'User Name',
+                hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
+            child: TextFormField(
+                controller: _fullNameController,
+                onSaved: (value) {
+                _fullName = value.toString();
+                },
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white10,
+                  filled: true,
+                  hintText: 'Your Display Name',
+                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+              )
+            ),
+          ),
+        ],
+      );
+    }
 
-                Padding(
+    Widget Step3 (){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+            Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15, bottom: 0),
+            child: TextFormField(
+                controller: _bioController,
+                onSaved: (value) => _bio = value!,
+                style: TextStyle(color: Colors.white),
+                maxLines: 5,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white10,
+                  filled: true,
+                  hintText: 'Add your Bio',
+                  hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+                )
+            ),
+          ),
+           Padding(
                   padding: const EdgeInsets.only(top: 20.0),
                   child: Container(
                     height: 50,
@@ -265,7 +261,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           signUp(_emailId, _password).then((user) async {
                             String? url = await instance.uploadPhoto(imageFile!, this._userName);
                             if (user != null) {
-                              instance.addUser(_userName,_emailId,_bio,url).then((value) {
+                              instance.addUser(_userName,_fullName,_emailId,_bio,url).then((value) {
                                 setState(() {
                                   successMessage = 'Registered Successfully';
                                 });
@@ -299,7 +295,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
-                hasLoaded==false ?  Center(child: CircularProgressIndicator())
+           hasLoaded==false ?  Center(child: CircularProgressIndicator())
                  : (successMessage != '' ? Text(
                   successMessage.toString(),
                   textAlign: TextAlign.center,
@@ -308,17 +304,92 @@ class _SignUpPageState extends State<SignUpPage> {
                     successMessage.toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 15, color: Colors.red)
-                ) : Container()),
-                SizedBox(height: 130),
-                TextButton(
-                  onPressed:(){
-                    Navigator.pop(context);
-                  },
-                  child: Text('Already have an account ? Log In',style: TextStyle(color: Colors.grey, fontSize: 15),)
+              ) : Container()),
+        ],
+      );
+    }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(title: Text('Sign In'),),
+        body: ListView(
+            
+              children: <Widget> [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Center(
+                    child: Container(
+                      child: GestureDetector(
+                        onTap: () async { await _showSelectionDialog(context); },
+                        child : imageFile != null ?
+                        CircleAvatar(
+                          radius: 60.0,
+                          backgroundImage:Image.file(
+                            imageFile!,
+                            fit: BoxFit.contain,
+                            height: 42,
+                          ).image ,
+                          backgroundColor: Colors.transparent,
+                        ) :
+                        Image.asset(
+                          "assets/images/signup.png",
+                          fit: BoxFit.contain,
+                          height: 42,
+                        ),
+                      )
+                    ),
+                  ),
+                ),
+                Form(
+                    autovalidateMode: AutovalidateMode.always, key: _formStateKey,
+                    child: Stepper(
+                        currentStep: _index,
+                        onStepCancel: () {
+                          if (_index > 0) {
+                            setState(() { _index -= 1; });
+                          }
+                        },
+                        onStepContinue: () {
+                          if (_index <= 0 && _index<=3) {
+                            setState(() { _index += 1; });
+                          }
+                        },
+                        onStepTapped: (int index) {
+                          setState(() { _index = index; });
+                        },
+                        steps: <Step>[
+                          Step(
+                            title: const Text('Auth',style: TextStyle(color: Colors.white)),
+                            content: Step1()
+                          ),
+                          Step(
+                            title: const Text('Identity',style: TextStyle(color: Colors.white)),
+                            content: Step2()
+                          ),
+                          Step(
+                            title: const Text('Bio',style: TextStyle(color: Colors.white)),
+                            content: Step3()
+                          )
+                        ],
+                      )     
+                    ),
+               
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                     TextButton(
+                      onPressed:(){
+                        Navigator.pop(context);
+                      },
+                      child: Text('Already have an account ? Log In',style: TextStyle(color: Colors.grey, fontSize: 15),)
+                    )
+                  ],
                 )
+               
               ],
             )
-        )
-    );
+        );
   }
 }

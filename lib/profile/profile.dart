@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:flutter/material.dart';
@@ -36,13 +37,12 @@ class _ProfilePageState extends State<ProfilePage> {
             return Column(
                 children: <Widget> [
                  Padding(padding:const EdgeInsets.only(left: 10,right: 10),
-                 child:  Row(
+                 child: Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                      children: <Widget> [
                         CircleAvatar(
                           radius: 50.0,
-                          backgroundImage:
-                          NetworkImage("${info['photoUrl']}"),
+                          backgroundImage: CachedNetworkImageProvider("${info['photoUrl']}"),
                           backgroundColor: Colors.transparent,
                         ),
                         Expanded(
@@ -50,40 +50,40 @@ class _ProfilePageState extends State<ProfilePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                                Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget> [
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget> [
-                                  Text('${info['no_of_posts']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
-                                  Text('Posts',style: TextStyle(color: Colors.white,fontSize: 12))        
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget> [
+                                        Text('${info['no_of_posts']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
+                                        Text('Posts',style: TextStyle(color: Colors.white,fontSize: 12))        
+                                      ],
+                                    )
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10.0,right: 10.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget> [
+                                        Text('${info['followers']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
+                                        Text('Followers',style: TextStyle(color: Colors.white,fontSize: 12))        
+                                      ],
+                                    )
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget> [
+                                        Text('${info['following']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
+                                        Text('Following',style: TextStyle(color: Colors.white,fontSize: 12))        
+                                      ],
+                                    )
+                                  )
                                 ],
                               )
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0,right: 10.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget> [
-                                  Text('${info['followers']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
-                                  Text('Followers',style: TextStyle(color: Colors.white,fontSize: 12))        
-                                ],
-                              )
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget> [
-                                  Text('${info['following']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
-                                  Text('Following',style: TextStyle(color: Colors.white,fontSize: 12))        
-                                ],
-                              )
-                            )
-                          ],
-                        )
                             ],
                           )
                         )
@@ -98,8 +98,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget> [
-                              Padding(padding: const EdgeInsets.only(top:5)),
-                              Text('${info['email']}',style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold)),
+                              Padding(padding: const EdgeInsets.only(top:15)),
+                              Text('${info['fullName']}',style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold)),
                               Padding(padding: const EdgeInsets.only(top:5)),
                               Text('${info['bio']}',style: TextStyle(color: Colors.white,fontSize: 15))
                             ]
@@ -133,25 +133,26 @@ class _ProfilePageState extends State<ProfilePage> {
                         child:GridView.count(
                           crossAxisCount: 3,
                           children: List.generate(info['posts'].length, (index) {
-                            String file = info['posts'][index]['images'][0];
+                            String url = info['posts'][index]['images'][0];
                             return Padding(
                               padding: EdgeInsets.all(5.0),
                                 child: Container(
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: Image.memory(base64Decode(file)).image,
+                                    image: CachedNetworkImageProvider(url),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                                 child: null
                               )
                             );
-                          }),
-                        )
+                          }
+                        ),
                       )
-                   )
-                ]
-              );
+                    )
+                  )
+              ]
+            );
           }
           return Container();
         }

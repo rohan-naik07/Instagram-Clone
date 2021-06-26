@@ -4,16 +4,18 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:first_flutter_project/futils/instance.dart';
 
 class Post{
-  Future<void>? addPost(
+
+  Future<DocumentReference<Map<String, dynamic>>>? addPost(
       String userName,
       String url,
-      List<String> images,
+      List<File> images,
       String description,
       DateTime date
-      ) {
+      ) async {
+    List<String> imageUrls = await uploadImages(images, userName, date);
     return Firestore.getInstance()!.collection("posts").add({
       'user_name': userName,
-      'images': images,
+      'images': imageUrls,
       'description': description,
       'likes': [],
       'comments': [],
@@ -64,12 +66,12 @@ class Post{
     var user = await Firestore.getInstance()!.collection("users").where('user_name',isEqualTo:name).get();
     var posts = await Firestore.getInstance()!.collection("posts").where('user_name',isEqualTo:name).get();
     return {
-      "email" : user.docs[0]['email'],
+      "fullName" : user.docs[0]['fullName'],
       "user_name" : user.docs[0]['user_name'],
       "photoUrl" : user.docs[0]['photoUrl'],
       "bio" : user.docs[0]['bio'],
       "no_of_posts" : posts.docs.length,
-      "followers" :  user.docs[0]['connections'].length ,
+      "followers" :  user.docs[0]['connections'].length,
       "following" :  user.docs[0]['connections'].length,
       "posts" : posts.docs,
     };

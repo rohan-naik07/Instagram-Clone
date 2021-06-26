@@ -18,6 +18,7 @@ class CommentsPage extends StatefulWidget {
 
 class _CommentsPageState extends State<CommentsPage> {
   var comments;
+  
   Widget renderComment(var comment){
     var post = widget.post;
     var date = DateTime.parse(comment['timestamp']);

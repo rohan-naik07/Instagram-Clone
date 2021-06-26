@@ -32,7 +32,7 @@ class _SubmitState extends State<SubmitPage> {
     return user;
   }
 
-  Future<void> submitPost(var user,List<String> photos,BuildContext context) async {
+  Future<void> submitPost(var user,List<File> photos,BuildContext context) async {
     setState(() {
       hasLoaded = false;
     });
@@ -130,7 +130,7 @@ class _SubmitState extends State<SubmitPage> {
                                 margin: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: Image.memory(base64Decode(image)).image,
+                                      image: Image.file(image).image,
                                       fit: BoxFit.cover,
                                     ),
                                   ),

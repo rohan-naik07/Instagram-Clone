@@ -4,6 +4,8 @@
    <application
         android:label="Instagram Clone"
         android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="false"
+        android:largeHeap="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

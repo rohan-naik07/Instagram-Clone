@@ -69,8 +69,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             final xfile = await _controller.takePicture();
             final image = File(xfile.path);
             var photos = context.read<ImageModel>();
-            String base64Image = base64Encode(image.readAsBytesSync());
-            photos.add(base64Image);
+            photos.add(image);
             Navigator.pop(context);
           } catch (e) {
             // If an error occurs, log the error to the console.

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
@@ -21,10 +22,10 @@ class _FeedPageState extends State<FeedPage> {
   var user;
 
   void likePost(post) async {
-    if(likes![post.id]!.contains(user['email'])){
-      likes![post.id]!.remove(user['email']);
+    if(likes![post.id]!.contains(user['_id'])){
+      likes![post.id]!.remove(user['_id']);
     } else {
-      likes![post.id]!.add(user['email']);
+      likes![post.id]!.add(user['_id']);
     }
     setState(() {
       likes = likes;
@@ -96,7 +97,7 @@ class _FeedPageState extends State<FeedPage> {
                         return Container(
                            decoration: BoxDecoration(
                               image: DecorationImage(
-                                image: Image.memory(base64Decode(image)).image,
+                                image: CachedNetworkImageProvider(image),
                                 fit: BoxFit.cover,
                               ),
                             ),

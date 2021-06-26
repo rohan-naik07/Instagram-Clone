@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var infoProvider = context.read<UserModel>();
     if(infoProvider.info==null){
-      var user = await Auth().getUser(prefs.getString("user_email"));
+      var user = await Auth().getUser(prefs.getString("user-email"));
       infoProvider.add(user);
       return user;
     }
