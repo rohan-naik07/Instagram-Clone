@@ -29,6 +29,16 @@ class Auth {
     };
   }
 
+  Future<dynamic> getUserbyId (id) async {
+    var user = await Firestore.getInstance()!.collection("users").doc(id).get();
+    return {
+      "_id" : user.id,
+      "email" : user['email'],
+      "user_name" : user['user_name'],
+      "photoUrl" : user['photoUrl']
+    };
+  }
+
   Future<List<DocumentSnapshot>> getSuggestion(String searchkey) =>
   Firestore.getInstance()!
       .collection('users')

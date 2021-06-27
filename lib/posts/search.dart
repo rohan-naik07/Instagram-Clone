@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/profile/profile.dart';
-import 'package:transparent_image/transparent_image.dart';
 import'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_flutter_project/futils/posts.dart';
@@ -103,7 +101,6 @@ class _SearchListState extends State<SearchList> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
    return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(

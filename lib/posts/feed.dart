@@ -1,6 +1,7 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:first_flutter_project/chat/chats.dart';
+import 'package:first_flutter_project/chat/messages.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:first_flutter_project/posts/comments.dart';
@@ -46,8 +47,7 @@ class _FeedPageState extends State<FeedPage> {
                   children: [
                     CircleAvatar(
                       radius: 15.0,
-                      backgroundImage:
-                      NetworkImage("${post['photoUrl']}"),
+                      backgroundImage: CachedNetworkImageProvider("${post['photoUrl']}"),
                       backgroundColor: Colors.transparent,
                     ),
                     Expanded(
@@ -83,6 +83,10 @@ class _FeedPageState extends State<FeedPage> {
                     ),
                   ],
                 ),
+              Divider(
+                thickness: 0.5,
+                color: Colors.grey,
+              ),
               CarouselSlider(
                   options: CarouselOptions(
                     height: 400,
@@ -112,7 +116,7 @@ class _FeedPageState extends State<FeedPage> {
                 children: [
                   IconButton(
                     onPressed: () { likePost(post); },
-                    icon : post['likes'].contains(user['email']) ?
+                    icon : post['likes'].contains(user['_id']) ?
                     Icon(
                      Icons.favorite,
                       size: 30,
@@ -175,7 +179,7 @@ class _FeedPageState extends State<FeedPage> {
                        CircleAvatar(
                         radius: 15.0,
                         backgroundImage:
-                        NetworkImage("${user['photoUrl']}"),
+                        CachedNetworkImageProvider("${user['photoUrl']}"),
                         backgroundColor: Colors.transparent,
                       ),
                       Expanded(
@@ -202,14 +206,12 @@ class _FeedPageState extends State<FeedPage> {
                             'timestamp' : DateTime.now().toString()
                           };
                           var postService = new Post();
-                          print('saving comment');
                           postService.postComments(comment).then(
                             (value) {
                               comments![post.id]!.add(value);
                               setState(() {
                                 comments = comments;
                               });
-                              print('saving comment id');
                               postService.updatePost(post.id, {'comments' : comments![post.id]});
                             }
                           );
@@ -257,7 +259,13 @@ class _FeedPageState extends State<FeedPage> {
                   Icons.details_sharp,
                   color: Colors.white,
                 ),
-                onPressed: null,
+                onPressed: (){
+                  Navigator.push(context,
+                  MaterialPageRoute(
+                    builder: (context)=>ChatsPage()
+                    )
+                  );
+                },
               )
           )
         ],

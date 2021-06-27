@@ -6,7 +6,6 @@ import 'package:first_flutter_project/posts/search.dart';
 import 'package:first_flutter_project/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {

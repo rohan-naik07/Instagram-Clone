@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:first_flutter_project/posts/create/submit.dart';
@@ -118,7 +117,6 @@ class _PhotosState extends State<PhotosPage> {
   @override
   Widget build(BuildContext context) {
     var photos = context.watch<ImageModel>();
-    // TODO: implement build
           return Scaffold(
             appBar: AppBar(
               title: Text('New Post', style: TextStyle(color: Colors.white, fontSize: 20)),

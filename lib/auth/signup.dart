@@ -70,8 +70,6 @@ class _SignUpPageState extends State<SignUpPage> {
             email: email.toString(),
             password: password.toString()
         );
-        assert(user != null);
-        assert(await user.user!.getIdToken() != null);
         return user.user;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
@@ -122,7 +120,7 @@ class _SignUpPageState extends State<SignUpPage> {
       return null;
     }
 
-    Widget Step1 (){
+    Widget step1 (){
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -182,7 +180,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ],
       );
     }
-  Widget Step2 (){
+  Widget step2 (){
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -224,7 +222,7 @@ class _SignUpPageState extends State<SignUpPage> {
       );
     }
 
-    Widget Step3 (){
+    Widget step3 (){
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -362,15 +360,15 @@ class _SignUpPageState extends State<SignUpPage> {
                         steps: <Step>[
                           Step(
                             title: const Text('Auth',style: TextStyle(color: Colors.white)),
-                            content: Step1()
+                            content: step1()
                           ),
                           Step(
                             title: const Text('Identity',style: TextStyle(color: Colors.white)),
-                            content: Step2()
+                            content: step2()
                           ),
                           Step(
                             title: const Text('Bio',style: TextStyle(color: Colors.white)),
-                            content: Step3()
+                            content: step3()
                           )
                         ],
                       )     

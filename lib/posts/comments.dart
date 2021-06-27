@@ -20,7 +20,6 @@ class _CommentsPageState extends State<CommentsPage> {
   var comments;
   
   Widget renderComment(var comment){
-    var post = widget.post;
     var date = DateTime.parse(comment['timestamp']);
     return Padding(
       padding: const EdgeInsets.all(5),
@@ -76,7 +75,6 @@ class _CommentsPageState extends State<CommentsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     var post = widget.post;
     var user = context.read<UserModel>().info;
     List<dynamic> comments;
