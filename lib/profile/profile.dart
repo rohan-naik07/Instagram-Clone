@@ -1,9 +1,13 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_flutter_project/auth/login.dart';
+import 'package:first_flutter_project/chat/messages.dart';
+import 'package:first_flutter_project/futils/chat.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   final String userName;
@@ -19,6 +23,69 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Post post = new Post();
+
+   User? user = FirebaseAuth.instance.currentUser;
+
+  Future<void> removeCredentials () async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
+    prefs.remove('user-email');
+  }
+  
+  List<Widget> getRowChildren(info,user){
+    return user["_id"]==info['user_id'] ? [
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
+          child: OutlinedButton(
+            onPressed: null,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(width: 1.0, color: Colors.grey)
+            ),
+            child: const Text("Edit Profile",style: TextStyle(color: Colors.white,fontSize: 15)),
+          )
+        ),
+      )
+    ] : [
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
+          child: OutlinedButton(
+            onPressed: null,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(width: 1.0, color: Colors.grey)
+            ),
+            child: const Text("Follow",style: TextStyle(color: Colors.white,fontSize: 15)),
+          )
+        ),
+      ),
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
+          child: OutlinedButton(
+            onPressed: ()async{
+              var chatId = await Chat().getChatId(user['_id'], info['user_id']);
+              Navigator.push(context, 
+                MaterialPageRoute( 
+                  builder: (context)=>MessagesPage(
+                    userId1: user['_id'], 
+                    userId2: info['user_id'] , 
+                    currentUserId:  user['_id'],
+                    chatId: chatId
+                  )
+                )
+              );
+            },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(width: 1.0, color: Colors.grey)
+            ),
+            child: const Text("Message",style: TextStyle(color: Colors.white,fontSize: 15)),
+          )
+        ),
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     var provider = context.read<UserModel>().info!;
@@ -29,6 +96,30 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
+      endDrawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                await removeCredentials();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context)=>LoginPage()), 
+                  (Route<dynamic> route) => false);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.save_alt),
+              title: Text('Saved Posts'),
+              onTap: (){
+                //Navigator.pushNamed(context, '/transactionsList');
+              },
+            ),
+          ]
+        )
+      ),
       body: FutureBuilder(
       future: post.getUserProfileInfo(user),
       builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
@@ -111,20 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
-                            child: OutlinedButton(
-                              onPressed: null,
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(width: 1.0, color: Colors.grey)
-                              ),
-                              child: const Text("Edit Profile",style: TextStyle(color: Colors.white,fontSize: 15)),
-                            )
-                          ),
-                        )
-                      ],
+                      children: getRowChildren(info, provider)
                     ),
                   ),
                    Expanded(

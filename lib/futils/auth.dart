@@ -29,6 +29,8 @@ class Auth {
     };
   }
 
+  Future<void> updateUser(id,update)=>Firestore.getInstance()!.collection("users").doc(id).update(update);
+
   Future<dynamic> getUserbyId (id) async {
     var user = await Firestore.getInstance()!.collection("users").doc(id).get();
     return {

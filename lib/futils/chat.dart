@@ -18,6 +18,22 @@ class Chat{
         return snapshot.docs;
     });
 
+  Future<dynamic> getChatId(String userId,String recepientId) =>
+   Firestore.getInstance()!
+      .collection('chats')
+      .where('participants', arrayContains: userId)
+      .get()
+      .then((snapshot) {
+        var chatId;
+        snapshot.docs.forEach((element) {
+          if(element['participants'].length==2 && element['participants'].contains(recepientId)){
+            chatId=element.id;
+          }
+          return chatId;
+        });
+        return chatId;
+    });
+
   Future<void> createMessage(String chatId, var messages) =>
    Firestore.getInstance()!
       .collection('chats')

@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:first_flutter_project/chat/chats.dart';
 import 'package:first_flutter_project/chat/messages.dart';
-import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:first_flutter_project/posts/comments.dart';
@@ -12,13 +11,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
 
-class FeedPage extends StatefulWidget {
+class PostsPage extends StatefulWidget {
+  final List<dynamic> posts;
+
+  const PostsPage({
+    Key? key,
+    required this.posts
+  }) : super(key: key);
   @override
-  _FeedPageState createState() => _FeedPageState();
+  _PostsPageState createState() => _PostsPageState();
 }
 
-class _FeedPageState extends State<FeedPage> {
-  List<dynamic>? posts;
+class _PostsPageState extends State<PostsPage> {
+
   Map<String,List<dynamic>>? likes;
   Map<String,List<dynamic>>? comments;
   var user;
@@ -36,11 +41,15 @@ class _FeedPageState extends State<FeedPage> {
     Post().updatePost(post.id,{"likes" : likes![post.id]});
   }
 
-  
   @override
-  void dispose() {
-    super.dispose();
-    Auth().updateUser(user['_id'], {'last_seen' : DateTime.now().toString()});
+  void initState() {
+    super.initState();
+    likes = new Map<String,List<dynamic>>();
+    comments = new Map<String,List<dynamic>>();
+    widget.posts.forEach((post) {
+      likes![post.id] = post['likes'];
+      comments![post.id] = post['comments'];
+    });
   }
 
   Widget? renderPost (post,user){
@@ -253,51 +262,12 @@ class _FeedPageState extends State<FeedPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Image.asset(
-          "assets/images/insta_logo.png",
-          fit: BoxFit.contain,
-          height: 42,
-        ),
-        toolbarHeight: 78,
-        actions: [
-          Transform.rotate(
-              angle: 60 * math.pi / 180,
-              child: IconButton(
-                icon: Icon(
-                  Icons.details_sharp,
-                  color: Colors.white,
-                ),
-                onPressed: (){
-                  Navigator.push(context,
-                  MaterialPageRoute(
-                    builder: (context)=>ChatsPage()
-                    )
-                  );
-                },
-              )
-          )
-        ],
+        title: Text('Posts')
       ),
-      body: FutureBuilder<dynamic>(
-        future: Post().getPosts(),
-        builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
-          if(snapshot.hasData){
-            posts = snapshot.data;
-            likes = new Map<String,List<dynamic>>();
-            comments = new Map<String,List<dynamic>>();
-            posts!.forEach((post) {
-              likes![post.id] = post['likes'];
-              comments![post.id] = post['comments'];
-            });
-
-            return new ListView.builder(
-                itemCount: posts!.length,
-                itemBuilder: (BuildContext ctxt, int index) {
-                  return renderPost(posts![index],user)!;
-                }
-            );
-          }
-          return Center(child: CircularProgressIndicator());
+      body: new ListView.builder(
+        itemCount: widget.posts.length,
+        itemBuilder: (BuildContext ctxt, int index) {
+          return renderPost(widget.posts[index],user)!;
         }
       )
     );   

@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/futils/posts.dart';
-import 'package:first_flutter_project/posts/feed.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -56,7 +54,6 @@ class _SubmitState extends State<SubmitPage> {
   @override
   Widget build(BuildContext context) {
     var photos = context.watch<ImageModel>();
-    // TODO: implement build
     return FutureBuilder<dynamic>(
         future: getUser(),
         builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){

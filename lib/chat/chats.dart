@@ -59,7 +59,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                     enabledBorder: InputBorder.none,
                                     errorBorder: InputBorder.none,
                                     disabledBorder: InputBorder.none,
-                                    hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
+                                    hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                               ),
                             )
@@ -135,7 +135,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                       ),
                                     );
                                 }
-                                return CircularProgressIndicator();
+                                return Center(child: CircularProgressIndicator());
                               }
                             );
                           }

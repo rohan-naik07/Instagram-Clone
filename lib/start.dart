@@ -92,7 +92,6 @@ class _SplashAppState extends State<SplashApp> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     precacheImage(AssetImage( "assets/images/logo.png"), context);
     return getScreen();
   }

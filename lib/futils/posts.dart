@@ -68,6 +68,7 @@ class Post{
     return {
       "fullName" : user.docs[0]['fullName'],
       "user_name" : user.docs[0]['user_name'],
+      "user_id" : user.docs[0].id,
       "photoUrl" : user.docs[0]['photoUrl'],
       "bio" : user.docs[0]['bio'],
       "no_of_posts" : posts.docs.length,

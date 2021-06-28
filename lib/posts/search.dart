@@ -13,14 +13,6 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  User? user = FirebaseAuth.instance.currentUser;
-
-  Future<void> removeCredentials () async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('token');
-    prefs.remove('user-email');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,6 +127,11 @@ class _SearchListState extends State<SearchList> {
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Search',
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
                         hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                     ),
@@ -160,7 +157,7 @@ class _SearchListState extends State<SearchList> {
                 children: <Widget>[
                   CircleAvatar(
                     radius: 30.0,
-                    backgroundImage:NetworkImage("${users[index]['photoUrl']}"),
+                    backgroundImage:CachedNetworkImageProvider("${users[index]['photoUrl']}"),
                     backgroundColor: Colors.transparent,
                   ),
                   Column(

@@ -15,6 +15,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
+  var infoProvider;
 
   static List<Widget> _widgetOptions = <Widget>[
     FeedPage(),
@@ -31,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<dynamic> getUserInfo(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var infoProvider = context.read<UserModel>();
+    infoProvider = context.read<UserModel>();
     if(infoProvider.info==null){
       var user = await Auth().getUser(prefs.getString("user-email"));
       infoProvider.add(user);
@@ -39,6 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return infoProvider.info;
   }
+
+  
 
 
   @override

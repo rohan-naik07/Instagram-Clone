@@ -186,7 +186,7 @@ class _MessagesPageState extends State<MessagesPage> {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                          await sendMessage();
+                      await sendMessage();
                     },
                   )
                 )
@@ -216,10 +216,10 @@ class _MessagesPageState extends State<MessagesPage> {
                       builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
                         messages = [];
                         if(snapshot.hasData){
-                          if(snapshot.data.docs.length!=0){
+                          
                             chatId = snapshot.data.id;
                             snapshot.data['messages'].forEach((message)=>messages!.add(message));
-                          } 
+                          
                           return displayUI(recepient);
                         }
                         return Center(child: CircularProgressIndicator());
@@ -230,6 +230,7 @@ class _MessagesPageState extends State<MessagesPage> {
               }
             );
           }
+          chatId = widget.chatId;
           return StreamBuilder<dynamic>(
               stream: Chat().getChat(widget.chatId),
               builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
