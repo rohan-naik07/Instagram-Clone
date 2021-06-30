@@ -78,7 +78,7 @@ class _MessagesPageState extends State<MessagesPage> {
         children: [
           Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
+                borderRadius: BorderRadius.circular(20.0),
                 color: message['author'] == widget.currentUserId ? Colors.blue : Colors.grey
               ),
               child: Padding(
@@ -98,7 +98,7 @@ class _MessagesPageState extends State<MessagesPage> {
         title: Row(
           children: <Widget> [
             CircleAvatar(
-                radius: 25.0,
+                radius: 20.0,
                 backgroundImage: CachedNetworkImageProvider("${recepient['photoUrl']}"),
                 backgroundColor: Colors.transparent,
             ),
@@ -131,10 +131,6 @@ class _MessagesPageState extends State<MessagesPage> {
       ),
       body: Column(
         children: [
-          Divider(
-            thickness: 0.5,
-            color: Colors.grey,
-          ),
           Expanded(
             child: ListView.builder(
                 itemCount: messages!.length,
@@ -145,6 +141,7 @@ class _MessagesPageState extends State<MessagesPage> {
           ),
           Container(
             margin: EdgeInsets.all(5),
+            padding: EdgeInsets.all(5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30.0),
               color:Colors.grey[800]
@@ -173,6 +170,13 @@ class _MessagesPageState extends State<MessagesPage> {
                       decoration: InputDecoration(
                         hintText: 'Message...',
                         hintStyle: TextStyle(fontSize: 15, color: Colors.white),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
                       ),
                     ),
                   ),

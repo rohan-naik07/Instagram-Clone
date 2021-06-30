@@ -96,27 +96,32 @@ class _SearchListState extends State<SearchList> {
    return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.grey[800]
-            ),
-          child:
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Row(
-                  children: [
-                    Icon(
-                      Icons.search,
-                      size: 20,
-                      color: Colors.white,
-                    ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5), 
-              child : SizedBox(
-                height: 20,
-                width: 200,
-                child: TextField(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.grey[800]
+          ),
+          child: GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute( builder: (context)=>SearchList() ));
+            },
+            child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5), 
+                        child :  SizedBox(
+                          width: 200,
+                          child: TextField(
                       controller: _searchQueryController,
                       onChanged: (value) async {
                         var snapshot = await Auth().getSuggestion(value.toLowerCase());
@@ -127,21 +132,29 @@ class _SearchListState extends State<SearchList> {
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Search',
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         errorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
+                        //contentPadding: const EdgeInsets.all(0.5),
                         hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                     ),
+                        )
+                      )
+                    ],
                   )
-                )
-              ],
-            )
+              )
+            ],
+          ),
           )
         ),
       ),
+
+     
       body:SizedBox(
            height: 400,
            child:  ListView.builder(

@@ -11,6 +11,11 @@ void main() {
   runApp(
       MaterialApp(
         title: 'Instagram Clone',
+        darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        /* dark theme settings */
+        ),
+        themeMode: ThemeMode.dark, 
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: Colors.black,
@@ -36,6 +41,11 @@ void runMainApp(token) {
         ],
         child : MaterialApp(
           title: 'Instagram Clone',
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            /* dark theme settings */
+          ),
+          themeMode: ThemeMode.dark, 
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             primaryColor: Colors.black,

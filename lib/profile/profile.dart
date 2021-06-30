@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_flutter_project/auth/login.dart';
 import 'package:first_flutter_project/chat/messages.dart';
+import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/futils/chat.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
@@ -23,8 +24,9 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Post post = new Post();
-
-   User? user = FirebaseAuth.instance.currentUser;
+  var info;
+  int followersCount=0;
+  int followingCount=0;
 
   Future<void> removeCredentials () async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,12 +52,26 @@ class _ProfilePageState extends State<ProfilePage> {
       Expanded(
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
-          child: OutlinedButton(
-            onPressed: null,
+          child: user['following'].contains(info['user-name']) ? 
+          OutlinedButton(
+            onPressed: () async {
+              List<dynamic> followers = info['followers'];
+              List<dynamic> following = user['following'];
+              followers.add(user['user_name']);
+              following.add(info['user_name']);
+              setState(() {
+                followersCount = followersCount + 1;
+              });
+              await Auth().updateUser(info['user_id'], {'followers' : followers});
+              await Auth().updateUser(user['_id'], {'following' : following});
+            },
             style: OutlinedButton.styleFrom(
               side: BorderSide(width: 1.0, color: Colors.grey)
             ),
             child: const Text("Follow",style: TextStyle(color: Colors.white,fontSize: 15)),
+          ) : OutlinedButton(
+            onPressed: null,
+            child: const Text("Following",style: TextStyle(color: Colors.grey,fontSize: 15)),
           )
         ),
       ),
@@ -90,42 +106,45 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     var provider = context.read<UserModel>().info!;
     var user = widget.userName == "" ? provider['user_name'] : widget.userName;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(user, style: TextStyle(color: Colors.white, fontSize: 20)),
-        backgroundColor: Colors.black,
-      ),
-      backgroundColor: Colors.black,
-      endDrawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                await removeCredentials();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context)=>LoginPage()), 
-                  (Route<dynamic> route) => false);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.save_alt),
-              title: Text('Saved Posts'),
-              onTap: (){
-                //Navigator.pushNamed(context, '/transactionsList');
-              },
-            ),
-          ]
-        )
-      ),
-      body: FutureBuilder(
+    return FutureBuilder(
       future: post.getUserProfileInfo(user),
       builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
           if(snapshot.hasData){
-            var info = snapshot.data;
-            return Column(
+            info = snapshot.data;
+            followersCount = snapshot.data['followers'].length;
+            followingCount = snapshot.data['following'].length;
+
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(user, style: TextStyle(color: Colors.white, fontSize: 20)),
+                backgroundColor: Colors.black,
+              ),
+              backgroundColor: Colors.black,
+              endDrawer: provider["_id"]==info['user_id'] ? Drawer(
+                child: ListView(
+                  children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
+                      onTap: () async {
+                        await FirebaseAuth.instance.signOut();
+                        await removeCredentials();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context)=>LoginPage()), 
+                          (Route<dynamic> route) => false);
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.save_alt),
+                      title: Text('Saved Posts'),
+                      onTap: (){
+                        //Navigator.pushNamed(context, '/transactionsList');
+                      },
+                    ),
+                  ]
+                )
+              ) : null,
+              body: Column(
                 children: <Widget> [
                  Padding(padding:const EdgeInsets.only(left: 10,right: 10),
                  child: Row(
@@ -158,7 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: <Widget> [
-                                        Text('${info['followers']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
+                                        Text('$followersCount',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
                                         Text('Followers',style: TextStyle(color: Colors.white,fontSize: 12))        
                                       ],
                                     )
@@ -168,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: <Widget> [
-                                        Text('${info['following']}',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
+                                        Text('$followingCount',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold)),
                                         Text('Following',style: TextStyle(color: Colors.white,fontSize: 12))        
                                       ],
                                     )
@@ -229,12 +248,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       )
                     )
                   )
-              ]
+                ]
+              )
             );
           }
           return Container();
         }
-      ),
-    );
-  } 
+      );
+    } 
 }

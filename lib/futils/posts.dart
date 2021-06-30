@@ -72,8 +72,8 @@ class Post{
       "photoUrl" : user.docs[0]['photoUrl'],
       "bio" : user.docs[0]['bio'],
       "no_of_posts" : posts.docs.length,
-      "followers" :  user.docs[0]['connections'].length,
-      "following" :  user.docs[0]['connections'].length,
+      "followers" :  user.docs[0]['followers'],
+      "following" :  user.docs[0]['following'],
       "posts" : posts.docs,
     };
   }

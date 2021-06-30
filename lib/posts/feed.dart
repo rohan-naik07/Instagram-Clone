@@ -91,10 +91,6 @@ class _FeedPageState extends State<FeedPage> {
                     ),
                   ],
                 ),
-              Divider(
-                thickness: 0.5,
-                color: Colors.grey,
-              ),
               CarouselSlider(
                   options: CarouselOptions(
                     height: 400,
@@ -157,11 +153,13 @@ class _FeedPageState extends State<FeedPage> {
                         fontWeight: FontWeight.bold
                     ),
                   ),
-                  Text(
-                    '${post['description']}',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15
+                  RichText(
+                    text: TextSpan(
+                      text: '${post['user_name']} ',
+                      style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
+                      children: <TextSpan>[
+                        TextSpan(text: '${post['description']}', style:TextStyle(fontSize: 15,fontWeight: FontWeight.normal)),
+                      ],
                     ),
                   ),
                   Padding(padding: const EdgeInsets.only(top:5.0)),
@@ -197,9 +195,14 @@ class _FeedPageState extends State<FeedPage> {
                               controller: _commentController,
                               style: TextStyle(color: Colors.white),
                               decoration: InputDecoration(
-                                border: UnderlineInputBorder(),
                                 hintText: 'Add a comment....',
                                 hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
                               ),
                             ),
                           ),
@@ -256,9 +259,9 @@ class _FeedPageState extends State<FeedPage> {
         title: Image.asset(
           "assets/images/insta_logo.png",
           fit: BoxFit.contain,
-          height: 42,
+          height: 40,
         ),
-        toolbarHeight: 78,
+        backgroundColor: Colors.black,
         actions: [
           Transform.rotate(
               angle: 60 * math.pi / 180,
@@ -282,13 +285,42 @@ class _FeedPageState extends State<FeedPage> {
         future: Post().getPosts(),
         builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
           if(snapshot.hasData){
-            posts = snapshot.data;
+            posts = [];
+            var postsData = snapshot.data;
             likes = new Map<String,List<dynamic>>();
             comments = new Map<String,List<dynamic>>();
-            posts!.forEach((post) {
-              likes![post.id] = post['likes'];
-              comments![post.id] = post['comments'];
+            postsData!.forEach((post) {
+              if(user['following'].contains(post['user_name'])){
+                posts!.add(post);
+                likes![post.id] = post['likes'];
+                comments![post.id] = post['comments'];
+              }
             });
+
+            if(posts!.length==0){
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                    'No posts to display',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    Text(
+                      'Search and follow people to see their posts',
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15
+                      ),
+                    )
+                  ],
+                )
+              );
+            }
 
             return new ListView.builder(
                 itemCount: posts!.length,

@@ -13,9 +13,8 @@ class Auth {
       'fullName' : fullName,
       'bio': bio,
       'photoUrl': url,
-      'connections':[],
-      'stories':[],
-      'posts': []
+      'followers': [],
+      'following': []
     });
   }
 
@@ -25,6 +24,8 @@ class Auth {
       "_id" : user.docs[0].id,
       "email" : user.docs[0]['email'],
       "user_name" : user.docs[0]['user_name'],
+      "followers" :  user.docs[0]['followers'],
+      "following" :  user.docs[0]['following'],
       "photoUrl" : user.docs[0]['photoUrl']
     };
   }
