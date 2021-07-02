@@ -1,22 +1,30 @@
+import 'dart:io';
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/futils/chat.dart';
+import 'package:first_flutter_project/futils/posts.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'dart:ui' as ui;
+import 'package:image/image.dart' as Im;
+import 'package:path_provider/path_provider.dart';
 
 class MessagesPage extends StatefulWidget {
   final userId1;
   final userId2;
   final currentUserId;
   final chatId;
+  final postId;
 
   const MessagesPage({
     Key? key,
     required this.userId1,
     required this.userId2,
     required this.currentUserId,
-    this.chatId
+    this.chatId,
+    this.postId
   }) : super(key: key);
 
   @override
@@ -53,23 +61,104 @@ class _MessagesPageState extends State<MessagesPage> {
     return chatId!;
   }
 
-  Future<void> sendMessage() async {
-    var message = {
-      'author' : widget.currentUserId,
-      'type' : 'text',
-      'text' : _messageController.text,
-      'post_id' : null,
-      'image_Url' : null,
-      'timestamp' : DateTime.now().toString(),
-      'status' : 0
-    };
-
-    var updatedMessages = messages;
-    updatedMessages!.add(message);
-    await Chat().createMessage(chatId!, updatedMessages);
+  Future<void> sendMessage(postId) async {
+    var message;
+    if(postId!=null){
+      message = {
+        'author' : widget.currentUserId,
+        'type' : 'post',
+        'text' : null,
+        'post_id' : postId,
+        'image_Url' : null,
+        'timestamp' : DateTime.now().toString(),
+        'status' : 0
+      };
+      await Chat().createPostMessage(chatId!,message);
+    } else {
+      message = {
+        'author' : widget.currentUserId,
+        'type' : 'text',
+        'text' : _messageController.text,
+        'post_id' : null,
+        'image_Url' : null,
+        'timestamp' : DateTime.now().toString(),
+        'status' : 0
+      };
+      var updatedMessages = messages;
+      updatedMessages!.add(message);
+      await Chat().createMessage(chatId!, updatedMessages);
+    }
   }
 
   Widget renderMessage(message){
+    if(message['type']=='post'){
+      print('erlfrm');
+      return Row(
+        mainAxisAlignment: message['author'] == widget.currentUserId ? 
+        MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [ 
+        Container(
+        margin: EdgeInsets.all(5),
+        width: 200,
+        height: 400,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30.0),
+          color:Colors.grey[850]
+        ),
+        child: FutureBuilder(
+          future: Post().getPostById(message['post_id']),
+          builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
+            if(snapshot.hasData){
+              var post = snapshot.data;
+                  return Column(
+                    children: [
+                       Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 15.0,
+                            backgroundImage: CachedNetworkImageProvider("${post['photoUrl']}"),
+                            backgroundColor: Colors.transparent,
+                          ),
+                          Expanded(
+                            /*1*/
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                /*2*/
+                                Container(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Material(
+                                      type: MaterialType.transparency,
+                                      child: TextButton(
+                                      onPressed: null,
+                                      child: Text(
+                                          '${post['user_name']}',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15
+                                        ),
+                                      )
+                                    )
+                                  )
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Image.network(post['images'][0]),
+                      Text(post['description'])
+                    ],
+                  );
+            }
+            return Center(child: CircularProgressIndicator());
+          }
+        )
+      ) 
+    ]    
+  );
+    }
+
     return Padding(
       padding : const EdgeInsets.all(5.0),
       child : Row(
@@ -79,11 +168,11 @@ class _MessagesPageState extends State<MessagesPage> {
           Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20.0),
-                color: message['author'] == widget.currentUserId ? Colors.blue : Colors.grey
+                color: message['author'] == widget.currentUserId ? Colors.blue : Colors.grey[800]
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Text(message['text'],style: TextStyle(color: Colors.white,fontSize: 18)),
+                child: Text(message['text'],style: TextStyle(color: Colors.white,fontSize: 15)),
             )
           )
         ],
@@ -95,6 +184,7 @@ class _MessagesPageState extends State<MessagesPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: Row(
           children: <Widget> [
             CircleAvatar(
@@ -144,7 +234,7 @@ class _MessagesPageState extends State<MessagesPage> {
             padding: EdgeInsets.all(5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30.0),
-              color:Colors.grey[800]
+              color:Colors.grey[850]
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -190,7 +280,7 @@ class _MessagesPageState extends State<MessagesPage> {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      await sendMessage();
+                      await sendMessage(null);
                     },
                   )
                 )
@@ -202,10 +292,25 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
+  Future<Uint8List> compressImage(imageUrl) async {
+    var rng = new math.Random();
+    // get temporary directory of device.
+    Directory tempDir = await getTemporaryDirectory();
+    // get temporary path from temporary directory.
+    String tempPath = tempDir.path;
+    // create a new file in temporary path with random file name.
+    File file = new File('$tempPath'+ (rng.nextInt(100)).toString() +'.png');
+    http.Response response = await http.get(Uri.parse(imageUrl));
+    file = await file.writeAsBytes(response.bodyBytes);
+    Im.Image? image = Im.decodeImage(file.readAsBytesSync());
+    Im.copyResize(image!, width : 500);
+    return image.getBytes();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Auth().getUserbyId(widget.currentUserId==widget.userId1 ? widget.userId2 : widget.userId1),
+      future: Auth().getUserbyId(widget.userId2),
       builder:(BuildContext context,AsyncSnapshot<dynamic> snapshot){
         if(snapshot.hasData){
           var recepient = snapshot.data;
@@ -215,15 +320,19 @@ class _MessagesPageState extends State<MessagesPage> {
               builder:(BuildContext context,AsyncSnapshot<dynamic> snapshot){
                 if(snapshot.hasData){
                   chatId = snapshot.data;
+                  if(widget.postId!=null){
+                    sendMessage(widget.postId);
+                  } 
                   return StreamBuilder<dynamic>(
                       stream: Chat().getChat(chatId!),
                       builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
                         messages = [];
                         if(snapshot.hasData){
-                          
-                            chatId = snapshot.data.id;
-                            snapshot.data['messages'].forEach((message)=>messages!.add(message));
-                          
+                          chatId = snapshot.data.id;
+                          snapshot.data['messages'].forEach((message)=>messages!.add(message));
+                          if(widget.postId){
+                            sendMessage(widget.postId);
+                          } 
                           return displayUI(recepient);
                         }
                         return Center(child: CircularProgressIndicator());
@@ -235,12 +344,15 @@ class _MessagesPageState extends State<MessagesPage> {
             );
           }
           chatId = widget.chatId;
+          if(widget.postId!=null){
+            sendMessage(widget.postId);
+          } 
           return StreamBuilder<dynamic>(
               stream: Chat().getChat(widget.chatId),
               builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
                 messages = [];
                 if(snapshot.hasData){
-                  snapshot.data['messages'].forEach((message)=>messages!.add(message)); 
+                  snapshot.data['messages'].forEach((message)=>messages!.add(message));
                   return displayUI(recepient);
                 }
                 return Center(child: CircularProgressIndicator());

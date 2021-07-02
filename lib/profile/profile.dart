@@ -6,6 +6,8 @@ import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/futils/chat.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
+import 'package:first_flutter_project/posts/posts.dart';
+import 'package:first_flutter_project/profile/updateProfile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,7 +42,11 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
           child: OutlinedButton(
-            onPressed: null,
+            onPressed: ()=>Navigator.push(context, 
+              MaterialPageRoute( 
+                builder: (context)=>UpdateProfilePage()
+              )
+            ),
             style: OutlinedButton.styleFrom(
               side: BorderSide(width: 1.0, color: Colors.grey)
             ),
@@ -51,7 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
     ] : [
       Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
+          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0,left: 10,right: 10),
           child: user['following'].contains(info['user-name']) ? 
           OutlinedButton(
             onPressed: () async {
@@ -77,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0),
+          padding: const EdgeInsets.only(top: 20.0,bottom: 20.0,left: 10,right: 10),
           child: OutlinedButton(
             onPressed: ()async{
               var chatId = await Chat().getChatId(user['_id'], info['user_id']);
@@ -221,6 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: getRowChildren(info, provider)
                     ),
                   ),
@@ -231,17 +238,24 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisCount: 3,
                           children: List.generate(info['posts'].length, (index) {
                             String url = info['posts'][index]['images'][0];
-                            return Padding(
-                              padding: EdgeInsets.all(5.0),
-                                child: Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: CachedNetworkImageProvider(url),
-                                    fit: BoxFit.cover,
+                            return GestureDetector(
+                              onTap: ()=>Navigator.push(context, 
+                                MaterialPageRoute( 
+                                  builder: (context)=>PostsPage(posts: info['posts'])
+                                )
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(5.0),
+                                  child: Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: CachedNetworkImageProvider(url),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ),
-                                child: null
-                              )
+                                  child: null
+                                )
+                              ),
                             );
                           }
                         ),

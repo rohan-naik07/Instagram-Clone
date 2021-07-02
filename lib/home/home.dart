@@ -41,9 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return infoProvider.info;
   }
 
-  
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

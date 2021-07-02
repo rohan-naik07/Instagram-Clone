@@ -71,10 +71,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       backgroundColor: Colors.black,
-      body: SingleChildScrollView(
-        child: Column(
+      body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget> [
-            SizedBox(height: 130),
             Padding(
               padding: const EdgeInsets.only(top: 60.0),
               child: Center(
@@ -203,21 +203,24 @@ class _LoginPageState extends State<LoginPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 15, color: Colors.red)
             ) : Container()),
-            SizedBox(height: 130),
-            TextButton(
-              onPressed:(){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
-                );
-              },
-              child: Text(
-                'New User? Create Account',
-                style: TextStyle(color: Colors.grey, fontSize: 15),
-              ),
-            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed:(){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                    );
+                  },
+                  child: Text(
+                    'New User? Create Account',
+                    style: TextStyle(color: Colors.grey, fontSize: 15),
+                  ),
+                ),
+              ],
+            )
           ],
-        )
       )
     );
   }

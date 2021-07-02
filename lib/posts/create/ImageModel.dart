@@ -17,7 +17,7 @@ class ImageModel extends ChangeNotifier {
   }
 
   void remove(File file) {
-    _photos.remove(File);
+    _photos.remove(file);
     // Don't forget to tell dependent widgets to rebuild _every time_
     // you change the model.
     notifyListeners();

@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:first_flutter_project/chat/chats.dart';
 import 'package:first_flutter_project/chat/messages.dart';
 import 'package:first_flutter_project/futils/auth.dart';
+import 'package:first_flutter_project/futils/chat.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:first_flutter_project/posts/comments.dart';
@@ -133,6 +134,27 @@ class _FeedPageState extends State<FeedPage> {
                     )
                   ),
                   IconButton(
+                    onPressed: ()async{
+                      var chatId = await Chat().getChatId(user['_id'], post['user_id']);
+                      Navigator.push(context, 
+                        MaterialPageRoute( 
+                          builder: (context)=>MessagesPage(
+                            userId1: user['_id'], 
+                            userId2: post['user_id'] , 
+                            currentUserId:  user['_id'],
+                            chatId: chatId,
+                            postId: post.id,
+                          )
+                        )
+                      );
+                    },
+                    icon: Icon(
+                      Icons.send,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
                     onPressed: null,
                     icon: Icon(
                       Icons.bookmark,
@@ -207,8 +229,8 @@ class _FeedPageState extends State<FeedPage> {
                             ),
                           ),
                       ),
-                      IconButton(
-                        onPressed: (){
+                     TextButton(
+                        onPressed: () {
                           var comment = {
                             'comment' : _commentController.text,
                             'post_id' : post.id,
@@ -227,12 +249,8 @@ class _FeedPageState extends State<FeedPage> {
                             }
                           );
                         },
-                        icon: Icon(
-                          Icons.send,
-                          size: 30,
-                          color: Colors.white,
-                        ),
-                      )
+                        child: Text('Send',style: TextStyle(color: Colors.blue,fontSize: 15)),
+                      ),
                     ],
                   ),
                   Text(

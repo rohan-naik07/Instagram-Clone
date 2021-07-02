@@ -38,13 +38,17 @@ class _PhotosState extends State<PhotosPage> {
                     mainAxisAlignment : MainAxisAlignment.end,
                     crossAxisAlignment : CrossAxisAlignment.end,
                     children : <Widget> [
-                      IconButton(
-                            onPressed: () {images.remove(file);},
-                            icon: Icon(
-                              Icons.delete,
-                              color: Colors.red,
-                            ),
-                          color: Colors.blue,
+                      RawMaterialButton(
+                        onPressed: () {images.remove(file);},
+                        elevation: 2.0,
+                        fillColor: Colors.red,
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        padding: EdgeInsets.all(10.0),
+                        shape: CircleBorder(),
                       ),
                     ]
                   ),
@@ -90,6 +94,13 @@ class _PhotosState extends State<PhotosPage> {
       });
     }
     if (!mounted) return;
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    var photos = context.read<ImageModel>();
+    photos.removeAll();
   }
 
   Future<File> getImageFileFromAsset(String path) async {

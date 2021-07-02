@@ -33,7 +33,9 @@ class Auth {
   Future<void> updateUser(id,update)=>Firestore.getInstance()!.collection("users").doc(id).update(update);
 
   Future<dynamic> getUserbyId (id) async {
+    print(id);
     var user = await Firestore.getInstance()!.collection("users").doc(id).get();
+    user.data()!.forEach((key, value) {print(key); });
     return {
       "_id" : user.id,
       "email" : user['email'],

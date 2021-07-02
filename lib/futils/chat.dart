@@ -39,6 +39,15 @@ class Chat{
       .collection('chats')
       .doc(chatId)
       .update({'messages' : messages});
+  
+  Future<void> createPostMessage(String chatId, var message) async {
+    var chat = await Firestore.getInstance()!
+      .collection('chats')
+      .doc(chatId).get();
+    List<dynamic> messages = chat['messages'];
+    messages.add(message);
+    await createMessage(chatId, messages);
+  }
      
 
   Future<String> createChat(chat) =>

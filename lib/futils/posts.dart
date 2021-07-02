@@ -10,11 +10,13 @@ class Post{
       String url,
       List<File> images,
       String description,
-      DateTime date
+      DateTime date,
+      String userId,
       ) async {
     List<String> imageUrls = await uploadImages(images, userName, date);
     return Firestore.getInstance()!.collection("posts").add({
       'user_name': userName,
+      'user_id' : userId,
       'images': imageUrls,
       'description': description,
       'likes': [],
@@ -29,6 +31,8 @@ class Post{
     var posts = await Firestore.getInstance()!.collection("posts").get();
     return posts.docs;
   }
+
+  Future<DocumentSnapshot<Map<String,dynamic>>> getPostById(String id)=> Firestore.getInstance()!.collection("posts").doc(id).get();
 
   Future<List<String>> uploadImages(
       List<File> images,

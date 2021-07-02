@@ -9,7 +9,6 @@ import 'package:first_flutter_project/profile/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
 
 class PostsPage extends StatefulWidget {
   final List<dynamic> posts;
@@ -262,7 +261,8 @@ class _PostsPageState extends State<PostsPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Posts')
+        title: Text('Posts'),
+        backgroundColor: Colors.black
       ),
       body: new ListView.builder(
         itemCount: widget.posts.length,
