@@ -2,6 +2,9 @@
 
 A fully functional Instagram Clone which you can discover people,create and share posts,like and comment on each other's posts and chat with one another. This cross platform application is completely built using Flutter framework using sophisticated state management techniques like Provider and Firebase server as a backend.
 
+
+|<img src="images/one.jpeg" width="280" height="480" />-----<img src="images/two.jpeg" width="280" height="480" />-----<img src="images/three.jpeg" width="280" height="480" />|
+
 ## How to Run the App
 <ol>
   <li>Download Flutter SDK and Dart and configure it as per your system</li>
@@ -24,10 +27,9 @@ Open source contributions are always welcome for improvement of this app. If you
 
 ## Upcoming features
 <ol>
-  <li>OAuth with facebook</li>
+  <li>Stories Module</li>
   <li>Activity Module</li>
   <li>Follow Request Module and Private Account Feature</li>
-  <li>Image processing and filtering</li>
   <li>App notifications,etc...</li>
 </ol>
 
