@@ -91,20 +91,18 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   Widget renderMessage(message){
-    if(message['type']=='post'){
-      print('erlfrm');
-      return Row(
-        mainAxisAlignment: message['author'] == widget.currentUserId ? 
-        MainAxisAlignment.end : MainAxisAlignment.start,
+  if(message['type']=='post'){
+    return Row(
+      mainAxisAlignment: message['author'] == widget.currentUserId ? 
+      MainAxisAlignment.end : MainAxisAlignment.start,
         children: [ 
         Container(
-        margin: EdgeInsets.all(5),
-        width: 200,
-        height: 400,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
-          color:Colors.grey[850]
-        ),
+          margin: EdgeInsets.all(5),
+          width: 250,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30.0),
+            color:Colors.grey[850]
+          ),
         child: FutureBuilder(
           future: Post().getPostById(message['post_id']),
           builder: (BuildContext context,AsyncSnapshot<dynamic> snapshot){
@@ -112,7 +110,9 @@ class _MessagesPageState extends State<MessagesPage> {
               var post = snapshot.data;
                   return Column(
                     children: [
-                       Row(
+                    Padding(
+                      padding: const EdgeInsets.only(left: 5),
+                      child: Row(
                         children: [
                           CircleAvatar(
                             radius: 15.0,
@@ -136,18 +136,35 @@ class _MessagesPageState extends State<MessagesPage> {
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15
-                                        ),
+                                          ),
+                                        )
                                       )
                                     )
-                                  )
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      Image.network(post['images'][0]),
-                      Text(post['description'])
+                      CachedNetworkImage(
+                          imageUrl: post['images'][0],
+                          placeholder: (context, url) => CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.all(15),
+                        child:  RichText(
+                          text: TextSpan(
+                            text: '${post['user_name']} ',
+                            style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
+                            children: <TextSpan>[
+                              TextSpan(text: '${post['description']}', style:TextStyle(fontSize: 15,fontWeight: FontWeight.normal)),
+                            ],
+                          ),
+                        )
+                      )
                     ],
                   );
             }

@@ -87,7 +87,6 @@ class _ChatsPageState extends State<ChatsPage> {
                                                 userId2: recepient['_id'], 
                                                 currentUserId: user['_id'],
                                                 chatId: chat.id,
-                                                postId: '8Yflh74mJwXa1JMRhsVv',
                                               )
                                             ),
                                         );
