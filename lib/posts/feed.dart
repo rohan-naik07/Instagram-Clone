@@ -11,6 +11,7 @@ import 'package:first_flutter_project/profile/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:first_flutter_project/error/error.dart';
 import 'dart:math' as math;
 
 class FeedPage extends StatefulWidget {
@@ -383,6 +384,10 @@ class _FeedPageState extends State<FeedPage> {
                                       ),
                                     );
                                 }
+                                if(snapshot.hasError){
+                                    Error.showError(context,snapshot.error.toString());
+                                    return Center(child: Error.errorContainer(snapshot.error.toString()));
+                                }
                                 return Center(child: CircularProgressIndicator());
                               }
                             );
@@ -392,6 +397,10 @@ class _FeedPageState extends State<FeedPage> {
                   ]
                 );
               }
+          if(snapshot.hasError){
+              Error.showError(context,snapshot.error.toString());
+              return Center(child: Error.errorContainer(snapshot.error.toString()));
+          }
           return Center(child: CircularProgressIndicator());
         }
       ),
@@ -439,7 +448,7 @@ class _FeedPageState extends State<FeedPage> {
             likes = new Map<String,List<dynamic>>();
             comments = new Map<String,List<dynamic>>();
             postsData!.forEach((post) {
-              if(user['following'].contains(post['user_name'])){
+              if(user['following'].contains(post['user_name'])==true){
                 posts!.add(post);
                 likes![post.id] = post['likes'];
                 comments![post.id] = post['comments'];
@@ -477,6 +486,10 @@ class _FeedPageState extends State<FeedPage> {
                   return renderPost(posts![index],user)!;
                 }
             );
+          }
+          if(snapshot.hasError){
+              Error.showError(context,snapshot.error.toString());
+              return Center(child: Error.errorContainer(snapshot.error.toString()));
           }
           return Center(child: CircularProgressIndicator());
         }

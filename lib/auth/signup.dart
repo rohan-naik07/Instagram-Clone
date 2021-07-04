@@ -350,7 +350,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           }
                         },
                         onStepContinue: () {
-                          if (_index <= 0 && _index<=3) {
+                          if (_index <= 0) {
                             setState(() { _index += 1; });
                           }
                         },

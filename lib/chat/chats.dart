@@ -5,6 +5,7 @@ import 'package:first_flutter_project/futils/chat.dart';
 import 'package:first_flutter_project/home/userInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:first_flutter_project/error/error.dart';
 
 class ChatsPage extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class _ChatsPageState extends State<ChatsPage> {
                       color: Colors.grey[800]
                     ),
                   child: Padding(
-                      padding: const EdgeInsets.only(left: 5,right: 5),
+                      padding: const EdgeInsets.all(10),
                       child: Row(
                         children: [
                           Icon(
@@ -55,11 +56,13 @@ class _ChatsPageState extends State<ChatsPage> {
                                 decoration: InputDecoration(
                                     hintText: 'Search',
                                     border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                                     focusedBorder: InputBorder.none,
                                     enabledBorder: InputBorder.none,
                                     errorBorder: InputBorder.none,
                                     disabledBorder: InputBorder.none,
-                                    hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+                                    hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
                                 ),
                               ),
                             )
@@ -135,6 +138,10 @@ class _ChatsPageState extends State<ChatsPage> {
                                       ),
                                     );
                                 }
+                                if(snapshot.hasError){
+                                  Error.showError(context,snapshot.error.toString());
+                                  return Center(child: Error.errorContainer(snapshot.error.toString()));
+                                }
                                 return Center(child: CircularProgressIndicator());
                               }
                             );
@@ -144,6 +151,10 @@ class _ChatsPageState extends State<ChatsPage> {
                   ]
                 );
               }
+            if(snapshot.hasError){
+              Error.showError(context,snapshot.error.toString());
+              return Center(child: Error.errorContainer(snapshot.error.toString()));
+            }
           return Center(child: CircularProgressIndicator());
         }
       )

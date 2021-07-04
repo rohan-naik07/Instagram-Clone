@@ -11,6 +11,7 @@ import 'package:first_flutter_project/profile/updateProfile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:first_flutter_project/error/error.dart';
 
 class ProfilePage extends StatefulWidget {
   final String userName;
@@ -58,7 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
       Expanded(
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0,bottom: 20.0,left: 10,right: 10),
-          child: user['following'].contains(info['user-name']) ? 
+          child: user['following'].contains(info['user-name'])==false ? 
           OutlinedButton(
             onPressed: () async {
               List<dynamic> followers = info['followers'];
@@ -266,7 +267,11 @@ class _ProfilePageState extends State<ProfilePage> {
               )
             );
           }
-          return Container();
+          if(snapshot.hasError){
+              Error.showError(context,snapshot.error.toString());
+              return Center(child: Error.errorContainer(snapshot.error.toString()));
+          }
+          return Center(child: CircularProgressIndicator());
         }
       );
     } 

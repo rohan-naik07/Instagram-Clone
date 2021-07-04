@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_flutter_project/futils/auth.dart';
 import 'package:first_flutter_project/profile/profile.dart';
 import'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:first_flutter_project/error/error.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -74,7 +74,11 @@ class _SearchPageState extends State<SearchPage> {
               crossAxisSpacing: 4.0,
             );
           }
-          return Container();        
+          if(snapshot.hasError){
+              Error.showError(context,snapshot.error.toString());
+              return Center(child: Error.errorContainer(snapshot.error.toString()));
+          }
+          return Center(child: CircularProgressIndicator());        
         },
       )
     );

@@ -7,9 +7,9 @@ import 'package:first_flutter_project/futils/chat.dart';
 import 'package:first_flutter_project/futils/posts.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:ui' as ui;
 import 'package:image/image.dart' as Im;
 import 'package:path_provider/path_provider.dart';
+import 'package:first_flutter_project/error/error.dart';
 
 class MessagesPage extends StatefulWidget {
   final userId1;
@@ -35,21 +35,11 @@ class _MessagesPageState extends State<MessagesPage> {
 
   String? chatId;
   List<dynamic>? messages;
-  Paint paint = Paint();
   var _messageController = new TextEditingController(text: '');
    
-
   @override
   initState(){
     super.initState();
-    paint.shader = ui.Gradient.linear(
-        const Offset(0, 60),
-        const Offset(60, 30),
-        <Color>[
-          Colors.pinkAccent,
-          Colors.amber
-        ],
-      );
   }
 
   Future<String> getChatId() async {
@@ -88,9 +78,10 @@ class _MessagesPageState extends State<MessagesPage> {
       updatedMessages!.add(message);
       await Chat().createMessage(chatId!, updatedMessages);
     }
+    _messageController.clear();
   }
 
-  Widget renderMessage(message){
+  Widget renderMessage(message) {
   if(message['type']=='post'){
     return Row(
       mainAxisAlignment: message['author'] == widget.currentUserId ? 
@@ -167,6 +158,10 @@ class _MessagesPageState extends State<MessagesPage> {
                       )
                     ],
                   );
+            }
+            if(snapshot.hasError){
+              Error.showError(context,snapshot.error.toString());
+              return Center(child: Error.errorContainer(snapshot.error.toString()));
             }
             return Center(child: CircularProgressIndicator());
           }
@@ -347,14 +342,19 @@ class _MessagesPageState extends State<MessagesPage> {
                         if(snapshot.hasData){
                           chatId = snapshot.data.id;
                           snapshot.data['messages'].forEach((message)=>messages!.add(message));
-                          if(widget.postId){
-                            sendMessage(widget.postId);
-                          } 
                           return displayUI(recepient);
+                        }
+                        if(snapshot.hasError){
+                          Error.showError(context,snapshot.error.toString());
+                          return Center(child: Error.errorContainer(snapshot.error.toString()));
                         }
                         return Center(child: CircularProgressIndicator());
                       }
                   );
+                }
+                if(snapshot.hasError){
+                  Error.showError(context,snapshot.error.toString());
+                  return Center(child: Error.errorContainer(snapshot.error.toString()));
                 }
                 return Center(child: CircularProgressIndicator());
               }
@@ -372,9 +372,17 @@ class _MessagesPageState extends State<MessagesPage> {
                   snapshot.data['messages'].forEach((message)=>messages!.add(message));
                   return displayUI(recepient);
                 }
+                if(snapshot.hasError){
+                  Error.showError(context,snapshot.error.toString());
+                  return Center(child: Error.errorContainer(snapshot.error.toString()));
+                }
                 return Center(child: CircularProgressIndicator());
               }
           );
+        }
+        if(snapshot.hasError){
+          Error.showError(context,snapshot.error.toString());
+          return Center(child: Error.errorContainer(snapshot.error.toString()));
         }
          return Center(child: CircularProgressIndicator());
       }

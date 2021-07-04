@@ -7,6 +7,7 @@ import 'package:first_flutter_project/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:first_flutter_project/error/error.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -51,7 +52,11 @@ class _MyHomePageState extends State<MyHomePage> {
           if (snapshot.connectionState == ConnectionState.done) {
             // If the Future is complete, display the preview.
             return _widgetOptions.elementAt(_selectedIndex);
-          } else {
+          } else if(snapshot.hasError){
+            Error.showError(context,snapshot.error.toString());
+            return Center(child: Error.errorContainer(snapshot.error.toString()));
+          }
+          else {
             // Otherwise, display a loading indicator.
             return const Center(child: CircularProgressIndicator());
           }
